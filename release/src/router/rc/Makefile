@@ -29,6 +29,10 @@ ifeq ($(RTCONFIG_WPS),y)
 CFLAGS += -I$(SRCBASE)/wps/brcm_apps/include
 endif
 
+ifeq ($(RTCONFIG_EXT_RTL8365MB),y)
+CFLAGS += -I$(LINUXDIR)/drivers/char/rtl8365mb
+endif
+
 ifeq ($(RTCONFIG_REALTEK),y)
 CFLAGS += -Wl,--gc-sections -ldl
 ifneq ($(findstring CONFIG_RTL_USERSPACE_WTDOG=, $(shell cat $(LINUXDIR)/.config)),)
@@ -322,13 +326,15 @@ OBJS += $(if $(wildcard k3.c), k3.o, prebuild/k3.o)
 OBJS += $(if $(wildcard k3ex.c), k3ex.o, prebuild/k3ex.o)
 else ifeq ($(K3C),y)
 OBJS += $(if $(wildcard k3c.c), k3c.o, prebuild/k3c.o)
+else ifeq ($(R7900P),y)
+OBJS += $(if $(wildcard r7900p.c), r7900p.o, prebuild/r7900p.o)
 else ifeq ($(R8000P),y)
 OBJS += $(if $(wildcard r7900p.c), r7900p.o, prebuild/r7900p.o)
 else
 OBJS += merlinr.o
 endif
-ifeq ($(and $(MERLINR_VER_MAJOR_X),$(RTAC86U)),y)
-OBJS += merlinrex.o
+ifeq ($(MERLINR_VER_MAJOR_X),y)
+OBJS += $(if $(wildcard merlinrex.c),merlinrex.o,prebuild/merlinrex.o)
 endif
 # TODO, speedtest
 ifeq ($(RTCONFIG_SPEEDTEST),y)
@@ -403,13 +409,17 @@ OBJS += pc_block.o
 OBJS += pc_tmp.o
 endif
 
+ifeq ($(RTCONFIG_INTERNETCTRL),y)
+OBJS += ic.o
+endif
+
 ifeq ($(RTCONFIG_HTTPS),y)
 ifeq ($(RTCONFIG_FRS_FEEDBACK),y)
 OBJS += dsl_fb.o
 endif
 endif
 ifeq ($(RTCONFIG_FRS_LIVE_UPDATE),y)
-ifneq ($(MERLINR_NAME), $(filter $(MERLINR_NAME), K3 K3C R8000P SBRAC1900P SBRAC3200P RTAC86U RTACRH17))
+ifneq ($(MERLINR_NAME), $(filter $(MERLINR_NAME), K3 K3C R8000P SBRAC1900P SBRAC3200P RTAC86U RTACRH17 GTAC2900))
 OBJS += frs_service.o
 endif
 endif
@@ -428,6 +438,7 @@ endif
 endif
 
 ifeq ($(and $(RTCONFIG_BCMWL6),$(RTCONFIG_PROXYSTA)),y)
+OBJS += arpreq.o
 OBJS += psta_monitor.o
 endif
 
@@ -654,6 +665,10 @@ ifneq ($(RTCONFIG_RALINK)$(RTCONFIG_QCA)$(RTCONFIG_REALTEK),y)
 OBJS += erp_monitor.o
 endif
 
+ifeq ($(RTCONFIG_GN_WBL),y)
+OBJS += gn_wbl.o
+endif
+
 ifeq ($(RCONFIG_SW_HW_AUTH), y)
 CLFAGS += -I(TOP)/sw-hw-auth
 endif
@@ -761,6 +776,7 @@ ifeq ($(HND_ROUTER),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc hnd-write
 	@cd $(INSTALLDIR)/sbin && ln -sf rc hnd-erase
 	@cd $(INSTALLDIR)/sbin && ln -sf rc mtd_erase_image_update
+	@cd $(INSTALLDIR)/sbin && ln -sf rc mtd_erase_misc2
 else
 	@cd $(INSTALLDIR)/sbin && ln -sf rc nvram_erase
 ifeq ($(RTCONFIG_BCMARM),y)
@@ -803,6 +819,7 @@ ifeq ($(and $(CONFIG_BCMWL5),$(RTCONFIG_FANCTRL)),y)
 endif
 
 ifeq ($(and $(RTCONFIG_BCMWL6),$(RTCONFIG_PROXYSTA)),y)
+	@cd $(INSTALLDIR)/sbin && ln -sf rc sendarp
 	@cd $(INSTALLDIR)/sbin && ln -sf rc psta_monitor
 endif
 
@@ -999,6 +1016,9 @@ ifeq ($(RTCONFIG_PARENTALCTRL),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc pc_block
 	@cd $(INSTALLDIR)/sbin && ln -sf rc pc_tmp
 endif
+ifeq ($(RTCONFIG_INTERNETCTRL),y)
+	@cd $(INSTALLDIR)/sbin && ln -sf rc ic
+endif
 	@cd $(INSTALLDIR)/sbin && ln -sf rc wlcscan
 ifeq ($(RTCONFIG_WIRELESSREPEATER),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc wlcconnect
@@ -1022,7 +1042,7 @@ ifeq ($(HND_ROUTER),y)
 endif
 	@cd $(INSTALLDIR)/sbin && ln -sf rc lanports_ctrl
 	@cd $(INSTALLDIR)/sbin && ln -sf rc GetExtPhyStatus
-ifeq ($(MERLINR_NAME), $(filter $(MERLINR_NAME), K3 R8000P))
+ifeq ($(MERLINR_NAME), $(filter $(MERLINR_NAME), K3 R7900P R8000P))
 	@cd $(INSTALLDIR)/sbin && ln -sf rc Get_PhyStatus
 endif
 ifeq ($(HND_ROUTER),y)
@@ -1126,6 +1146,9 @@ endif
 ifeq ($(or $(RTAC68U),$(RT4GAC68U)),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc firmware_enc_crc
 	@cd $(INSTALLDIR)/sbin && ln -sf rc fw_check
+endif
+ifeq ($(strip $(MERLINR_NAME)),$(filter $(MERLINR_NAME), SBRAC1900P SBRAC3200P R7900P R8000P))
+	@cd $(INSTALLDIR)/sbin && ln -sf rc toolbox
 endif
 
 clean:

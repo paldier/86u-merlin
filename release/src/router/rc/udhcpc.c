@@ -717,7 +717,8 @@ start_udhcpc(char *wan_ifname, int unit, pid_t *ppid)
 	    nvram_match(strcat_r(prefix, "vpndhcp", tmp), "0"))
 		return start_zcip(wan_ifname, unit, ppid);
 
-	if (nvram_get_int("dhcpc_mode") == 0) {
+	int dhcpc_mode = nvram_get_int("dhcpc_mode");	// default = Aggressive mode
+	if (dhcpc_mode == 0) {	// Normal mode
 		/* 2 discover packets max (default 3 discover packets) */
 		dhcp_argv[index++] = "-t2";
 		/* 5 seconds between packets (default 3 seconds) */
@@ -725,6 +726,11 @@ start_udhcpc(char *wan_ifname, int unit, pid_t *ppid)
 		/* Wait 160 seconds before trying again (default 20 seconds) */
 		/* set to 160 to accomodate new timings enforced by Charter cable */
 		dhcp_argv[index++] = "-A160";
+	}
+	else if(dhcpc_mode == 2){	// Continuous mode
+		dhcp_argv[index++] = "-t1";
+		dhcp_argv[index++] = "-T5";
+		dhcp_argv[index++] = "-A0";
 	}
 
 	if (ppid == NULL)
@@ -1363,7 +1369,7 @@ int dhcp6c_wan(int argc, char **argv)
 	else if (strcmp(argv[2], "informed") == 0)
 		return bound6(argv[1], 0);
 	else if (strcmp(argv[2], "ra-updated") == 0)
-		return ra_updated6(argv[2]);
+		return ra_updated6(argv[1]);
 
 	return 0;
 }
@@ -1437,8 +1443,6 @@ start_dhcp6c(void)
 		dhcp6c_argv[index++] = "-r23";	/* dns */
 		dhcp6c_argv[index++] = "-r24";	/* domain */
 	}
-	dhcp6c_argv[index++] = "-r82";	/* sol_max_rt */
-	dhcp6c_argv[index++] = "-r83";	/* inf_max_rt */
 
 	if (nvram_get_int("ipv6_debug"))
 		dhcp6c_argv[index++] = "-v";

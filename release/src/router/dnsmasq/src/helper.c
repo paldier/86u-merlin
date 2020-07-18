@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2020 Simon Kelley
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -66,7 +66,8 @@ struct script_data
 #endif
   struct in6_addr addr6;
 #ifdef HAVE_DHCP6
-  int iaid, vendorclass_count;
+  int vendorclass_count;
+  unsigned int iaid;
 #endif
   unsigned char hwaddr[DHCP_CHADDR_MAX];
   char interface[IF_NAMESIZE];
@@ -130,12 +131,8 @@ int create_helper(int event_fd, int err_fd, uid_t uid, gid_t gid, long max_fd)
      Don't close err_fd, in case the lua-init fails.
      Note that we have to do this before lua init
      so we don't close any lua fds. */
-  for (max_fd--; max_fd >= 0; max_fd--)
-    if (max_fd != STDOUT_FILENO && max_fd != STDERR_FILENO && 
-	max_fd != STDIN_FILENO && max_fd != pipefd[0] && 
-	max_fd != event_fd && max_fd != err_fd)
-      close(max_fd);
-
+  close_fds(max_fd, pipefd[0], event_fd, err_fd);
+  
 #ifdef HAVE_LUASCRIPT
   if (daemon->luascript)
     {

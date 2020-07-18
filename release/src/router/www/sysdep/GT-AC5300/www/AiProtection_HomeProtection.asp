@@ -88,9 +88,9 @@
 
 .alertpreference{
 	width:650px;
-	height:290px;
+	height:350px;
 	position:absolute;
-	background: rgba(0,0,0,0.8);
+	background: rgba(0,0,0,0.9);
 	z-index:10;
 	margin-left:260px;
 	border-radius:10px;
@@ -1051,10 +1051,18 @@ function shadeHandle(flag){
 					</div>
 					<div class="flexbox checkbox-container">
 							<div>
-									<input id="cc_item" type="checkbox">
-									<label for="cc_item">
-											<div></div>
-									</label>
+								<div>
+									<input type="checkbox" id="mal_website_item">
+									<span style="color: #FFF;"><#AiProtection_sites_blocking#></span>
+								</div>
+								<div>
+									<input type="checkbox" id="vp_item">
+									<span style="color: #FFF;"><#AiProtection_two-way_IPS#></span>
+								</div>
+								<div>
+									<input type="checkbox" id="cc_item">
+									<span style="color: #FFF;"><#AiProtection_detection_blocking#></span>
+								</div>								
 							</div>
 							<div class="checkbox-desc"><#AiProtection_detection_blocking#></div>
 					</div>

@@ -37,6 +37,9 @@ km_hw_algo_write_key(km_hw_t *hw, hwktab_addr_t addr, const uint8 *data, size_t 
 {
 	wlc_info_t *wlc = KM_HW_WLC(hw);
 
+	if ((data_len > 0) && !data[0]) {
+		data = km_hw_fixup_null_hw_key(hw, data, data_len);
+	}
 	KM_HW_COPYTO_HWKTAB(wlc, addr, data, data_len & ~3);
 	KM_DBG_ASSERT((data_len & 0x1) == 0);
 	if (data_len & 0x2) {

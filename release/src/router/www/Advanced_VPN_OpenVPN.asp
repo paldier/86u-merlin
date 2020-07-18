@@ -123,7 +123,6 @@ var hmacarray = [
 ];
 
 var wans_mode ='<% nvram_get("wans_mode"); %>';
-var port_suggestion = "* <#SSH_Port_Suggestion#>".replace("SSH", "OpenVPN").replace("22", "1194");
 
 function initial(){
 	var current_server_igncrt = "<% nvram_get("vpn_server_igncrt"); %>";
@@ -131,8 +130,6 @@ function initial(){
 
 	show_menu();
 
-	$("#portSuggestionBasic").html(port_suggestion);
-	$("#portSuggestionAdvanced").html(port_suggestion);
 	formShowAndHide(vpn_server_enable, "openvpn");
 
 	/*Advanced Setting start */
@@ -174,7 +171,7 @@ function initial(){
 	$('#divSwitchMenu').html(gen_switch_menu(vpn_server_array, "OpenVPN"));
 
 	//check DUT is belong to private IP.
-	setTimeout("show_warning_message();", 100);
+	setTimeout("show_warning_message();", 1000);
 
 	//set FAQ URL
 	//	https://www.asus.com/support/FAQ/1004469
@@ -224,7 +221,6 @@ function show_warning_message(){
 	}
 }
 
-<% get_realip(); %>
 function get_real_ip(){
 	$.ajax({
 		url: 'get_real_ip.asp',
@@ -1426,7 +1422,7 @@ function callback_upload_cert(_flag) {
 											<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(32,6);"><#WLANAuthentication11a_ExAuthDBPortNumber_itemname#></a></th>
 											<td>
 												<input type="text" maxlength="5" class="input_6_table" name="vpn_server_port_basic" onKeyPress="return validator.isNumber(this,event);" value="<% nvram_get("vpn_server_port"); %>" autocorrect="off" autocapitalize="off">
-												<div id="portSuggestionBasic" style="color: #FFCC00;"></div>
+												<div id="portSuggestionBasic" style="color: #FFCC00;"><#SSH_Port_Suggestion#></div>
 											</td>
 										</tr>
 										<tr id="trRSAEncryptionBasic">
@@ -1606,7 +1602,7 @@ function callback_upload_cert(_flag) {
 												<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(32,6);"><#WLANAuthentication11a_ExAuthDBPortNumber_itemname#></a></th>
 												<td>
 													<input type="text" maxlength="5" class="input_6_table" name="vpn_server_port_adv" onKeyPress="return validator.isNumber(this,event);" value="<% nvram_get("vpn_server_port"); %>" autocorrect="off" autocapitalize="off">
-													<div id="portSuggestionAdvanced" style="color: #FFCC00;"></div>
+													<div id="portSuggestionAdvanced" style="color: #FFCC00;"><#SSH_Port_Suggestion#></div>
 												</td>
 											</tr>
 

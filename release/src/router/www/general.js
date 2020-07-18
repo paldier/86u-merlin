@@ -308,6 +308,7 @@ function show_cert_settings(show){
 
 function change_ddns_setting(v){
 		var hostname_x = '<% nvram_get("ddns_hostname_x"); %>';
+		document.getElementById("ddns_result_tr").style.display = "none";
 		if (v == "WWW.ASUS.COM"){
 				document.getElementById("ddns_hostname_info_tr").style.display = "none";
 				document.getElementById("ddns_hostname_tr").style.display="";
@@ -453,6 +454,7 @@ function change_common_radio(o, s, v, r){
 			showhide("check_ddns_field", 0);
 			inputCtrl(document.form.ddns_regular_period, 0);
 
+			document.getElementById("ddns_result_tr").style.display = "none";
 			if(letsencrypt_support)
 				show_cert_settings(0);
 		}

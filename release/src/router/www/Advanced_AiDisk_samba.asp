@@ -20,6 +20,11 @@
 <script type="text/javascript" src="/js/jquery.js"></script>
 <script type="text/javascript" src="/js/httpApi.js"></script>
 <script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
+<style>
+.charToUpperCase{
+	text-transform: uppercase;
+}
+</style>
 <script type="text/javascript">
 
 <% get_AiDisk_status(); %>
@@ -675,7 +680,7 @@ function applyRule(){
 function validForm(){
 	
 	if(document.form.computer_name.value.length > 0){
-		var alert_str = validator.hostName(document.form.computer_name);
+		var alert_str = validator.samba_name(document.form.computer_name);
 		if(alert_str != ""){
 			showtext(document.getElementById("alert_msg1"), alert_str);
 			document.getElementById("alert_msg1").style.display = "";
@@ -686,7 +691,7 @@ function validForm(){
 		else
 			document.getElementById("alert_msg1").style.display = "none";
 
-		document.form.computer_name.value = trim(document.form.computer_name.value);
+		document.form.computer_name.value = trim(document.form.computer_name.value).toUpperCase();
 	}
 				  
 	if(document.form.st_samba_workgroup.value.length == 0 && !lan_domain){
@@ -696,13 +701,14 @@ function validForm(){
 		return false;	
 	}
 	else if(document.form.st_samba_workgroup.value.length > 0){
-		var workgroup_check = new RegExp('^[a-zA-Z0-9][a-zA-Z0-9\-\_\.]+$','gi');	  	
-  		if(!workgroup_check.test(document.form.st_samba_workgroup.value)){
-			alert("<#JS_validchar#>");               
+		var alert_str = validator.samba_name(document.form.st_samba_workgroup);
+		if(alert_str != ""){
+			alert(alert_str);
 			document.form.st_samba_workgroup.focus();
 			document.form.st_samba_workgroup.select();
 			return false;
-		}   
+		}
+		document.form.st_samba_workgroup.value = trim(document.form.st_samba_workgroup.value).toUpperCase();
 	}
 
 	return true;
@@ -835,7 +841,7 @@ function switchUserType(flag){
 						<a class="hintstyle" href="javascript:void(0);" onClick="openHint(17,2);"><#ShareNode_DeviceName_itemname#></a>
 					</th>
 					<td>
-						<div><input type="text" name="computer_name" id="computer_name" class="input_20_table" maxlength="15" value="<% nvram_get("computer_name"); %>" autocorrect="off" autocapitalize="on"><br/>
+						<div><input type="text" name="computer_name" id="computer_name" class="input_20_table charToUpperCase" maxlength="15" value="<% nvram_get("computer_name"); %>" autocorrect="off" autocapitalize="on"><br/>
 						<span id="alert_msg1" style="color:#FC0;"></span></div>
 					</td>
 				</tr>
@@ -844,7 +850,7 @@ function switchUserType(flag){
 						<a class="hintstyle" href="javascript:void(0);" onClick="openHint(17,3);"><#ShareNode_WorkGroup_itemname#></a>
 					</th>
 					<td>
-						<input type="text" name="st_samba_workgroup" id="st_samba_workgroup" class="input_20_table" maxlength="15" value="<% nvram_get("st_samba_workgroup"); %>" autocorrect="off" autocapitalize="on">
+						<input type="text" name="st_samba_workgroup" id="st_samba_workgroup" class="input_20_table charToUpperCase" maxlength="15" value="<% nvram_get("st_samba_workgroup"); %>" autocorrect="off" autocapitalize="on">
 					</td>
 				</tr>
 				<tr id="ntfs_sparse_files" style="">

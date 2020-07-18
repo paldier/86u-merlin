@@ -968,15 +968,15 @@ static void calc(void)
 				vlan_tx += counter[1];
 			}
 			if(strncmp(ifname, "eth0", 4)==0){
-				if(counter[0]>vlan_rx) {
+				if(counter[0]>=vlan_rx) {
 					counter[0] -= vlan_rx;
 				} else {
-					counter[0] = counter[0] + 0xffffffff - vlan_rx;
+					counter[0] = counter[0] + (~0ULL - vlan_rx + 1);
 				}
-				if(counter[1]>vlan_tx) {
+				if(counter[1]>=vlan_tx) {
 					counter[1] -= vlan_tx;
 				} else {
-					counter[1] = counter[1] + 0xffffffff - vlan_tx;
+					counter[1] = counter[1] + (~0ULL - vlan_tx + 1);
 				}
 			}
 		}

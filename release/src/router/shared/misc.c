@@ -118,111 +118,6 @@ extern char *get_line_from_buffer(const char *buf, char *line, const int line_si
 	return line;
 }
 
-extern char *get_upper_str(const char *const str, char **target){
-	int len, i;
-	char *ptr;
-
-	len = strlen(str);
-	*target = (char *)malloc(sizeof(char)*(len+1));
-	if(*target == NULL){
-		_dprintf("No memory \"*target\".\n");
-		return NULL;
-	}
-	ptr = *target;
-	for(i = 0; i < len; ++i)
-		ptr[i] = toupper(str[i]);
-	ptr[len] = 0;
-
-	return ptr;
-}
-
-extern int upper_strcmp(const char *const str1, const char *const str2){
-	char *upper_str1, *upper_str2;
-	int ret;
-
-	if(str1 == NULL || str2 == NULL)
-		return -1;
-
-	if(get_upper_str(str1, &upper_str1) == NULL)
-		return -1;
-
-	if(get_upper_str(str2, &upper_str2) == NULL){
-		free(upper_str1);
-		return -1;
-	}
-
-	ret = strcmp(upper_str1, upper_str2);
-	free(upper_str1);
-	free(upper_str2);
-
-	return ret;
-}
-
-extern int upper_strncmp(const char *const str1, const char *const str2, int count){
-	char *upper_str1, *upper_str2;
-	int ret;
-
-	if(str1 == NULL || str2 == NULL)
-		return -1;
-
-	if(get_upper_str(str1, &upper_str1) == NULL)
-		return -1;
-
-	if(get_upper_str(str2, &upper_str2) == NULL){
-		free(upper_str1);
-		return -1;
-	}
-
-	ret = strncmp(upper_str1, upper_str2, count);
-	free(upper_str1);
-	free(upper_str2);
-
-	return ret;
-}
-
-extern char *upper_strstr(const char *const str, const char *const target){
-	char *upper_str, *upper_target;
-	char *ret;
-	int len;
-
-	if(str == NULL || target == NULL)
-		return NULL;
-
-	if(get_upper_str(str, &upper_str) == NULL)
-		return NULL;
-
-	if(get_upper_str(target, &upper_target) == NULL){
-		free(upper_str);
-		return NULL;
-	}
-
-	ret = strstr(upper_str, upper_target);
-	if(ret == NULL){
-		free(upper_str);
-		free(upper_target);
-		return NULL;
-	}
-
-	if((len = upper_str-ret) < 0)
-		len = ret-upper_str;
-
-	free(upper_str);
-	free(upper_target);
-
-	return (char *)(str+len);
-}
-
-int stricmp(char const *a, char const *b, int len)
-{
-	for (;len--; a++, b++) {
-		int d = tolower(*a) - tolower(*b);
-		if (d != 0 || !*a)
-			return d;
-	}
-
-	return 0;
-}
-
 #ifdef HND_ROUTER
 // defined (__GLIBC__) && !defined(__UCLIBC__)
 size_t strlcpy(char *dst, const char *src, size_t size)
@@ -4886,3 +4781,20 @@ int get_index_page(char *page, int size)
 	return 0;
 }
 
+/*
+	general API to check wss supported interface
+*/
+int amazon_wss_ap_isolate_support(char *prefix)
+{
+	char gn_wbl_en[32] = {0};
+
+	/* not amazon_wss interface */
+	if (strcmp(prefix, "wl0.2_")) return 0;
+
+	/* amazon_ffs is enabled */
+	snprintf(gn_wbl_en, sizeof(gn_wbl_en), "%sgn_wbl_enable", prefix);
+	if (nvram_match(gn_wbl_en, "1")) return 1;
+
+	/* mismatch */
+	return 0;
+}

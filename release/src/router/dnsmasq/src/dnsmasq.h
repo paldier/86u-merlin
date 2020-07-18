@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2020 Simon Kelley
  
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define COPYRIGHT "Copyright (c) 2000-2018 Simon Kelley"
+#define COPYRIGHT "Copyright (c) 2000-2020 Simon Kelley"
 
 /* We do defines that influence behavior of stdio.h, so complain
    if included too early. */
@@ -95,7 +95,11 @@ typedef unsigned long long u64;
 #if defined(HAVE_SOLARIS_NETWORK)
 #  include <sys/sockio.h>
 #endif
-#include <sys/poll.h>
+#if defined(HAVE_POLL_H)
+#  include <poll.h>
+#else
+#  include <sys/poll.h>
+#endif
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <sys/un.h>
@@ -137,6 +141,7 @@ typedef unsigned long long u64;
 #endif
 
 #if defined(HAVE_LINUX_NETWORK)
+#include <linux/version.h>
 #include <linux/sockios.h>
 #include <linux/capability.h>
 /* There doesn't seem to be a universally-available 
@@ -262,7 +267,9 @@ struct event_desc {
 #define OPT_RAPID_COMMIT   57
 #define OPT_UBUS           58
 #define OPT_IGNORE_CLID    59
-#define OPT_LAST           60
+#define OPT_SINGLE_PORT    60
+#define OPT_LEASE_RENEW    61
+#define OPT_LAST           62
 
 #define OPTION_BITS (sizeof(unsigned int)*8)
 #define OPTION_SIZE ( (OPT_LAST/OPTION_BITS)+((OPT_LAST%OPTION_BITS)!=0) )
@@ -287,9 +294,10 @@ union all_addr {
   struct {
     union {
       struct crec *cache;
-      struct interface_name *int_name;
+      char *name;
     } target;
-    unsigned int uid; /* 0 if union is interface-name */
+    unsigned int uid;
+    int is_name_ptr;  /* disciminates target union */
   } cname;
   struct {
     struct blockdata *keydata;
@@ -372,13 +380,17 @@ struct ds_config {
   struct ds_config *next;
 };
 
-#define ADDRLIST_LITERAL 1
-#define ADDRLIST_IPV6    2
-#define ADDRLIST_REVONLY 4
+#define ADDRLIST_LITERAL  1
+#define ADDRLIST_IPV6     2
+#define ADDRLIST_REVONLY  4
+#define ADDRLIST_PREFIX   8
+#define ADDRLIST_WILDCARD 16
+#define ADDRLIST_DECLINED 32
 
 struct addrlist {
   union all_addr addr;
-  int flags, prefixlen; 
+  int flags, prefixlen;
+  time_t decline_time;
   struct addrlist *next;
 };
 
@@ -397,9 +409,11 @@ struct auth_zone {
   struct auth_zone *next;
 };
 
+#define HR_6 1
+#define HR_4 2
 
 struct host_record {
-  int ttl;
+  int ttl, flags;
   struct name_list {
     char *name;
     struct name_list *next;
@@ -460,9 +474,6 @@ struct crec {
 #define F_CONFIG    (1u<<13)
 #define F_DS        (1u<<14)
 #define F_DNSSECOK  (1u<<15)
-
-/* below here are only valid as args to log_query: cache
-   entries are limited to 16 bits */
 #define F_UPSTREAM  (1u<<16)
 #define F_RRNAME    (1u<<17)
 #define F_SERVER    (1u<<18)
@@ -475,16 +486,12 @@ struct crec {
 #define F_NO_RR     (1u<<25)
 #define F_IPSET     (1u<<26)
 #define F_NOEXTRA   (1u<<27)
-#define F_SERVFAIL  (1u<<28)
+#define F_SERVFAIL  (1u<<28) /* currently unused. */
 #define F_RCODE     (1u<<29)
 #define F_SRV       (1u<<30)
 
 #define UID_NONE      0
 /* Values of uid in crecs with F_CONFIG bit set. */
-/* cname to uid SRC_INTERFACE are to interface names,
-   so use UID_NONE for that to eliminate clashes with
-   any other uid */
-#define SRC_INTERFACE UID_NONE
 #define SRC_CONFIG    1
 #define SRC_HOSTS     2
 #define SRC_AH        3
@@ -700,6 +707,7 @@ struct frec {
 #define LEASE_NA            32  /* IPv6 no-temporary lease */
 #define LEASE_TA            64  /* IPv6 temporary lease */
 #define LEASE_HAVE_HWADDR  128  /* Have set hwaddress */
+#define LEASE_EXP_CHANGED  256  /* Lease expiry time changed */
 
 struct dhcp_lease {
   int clid_len;          /* length of client identifier */
@@ -721,7 +729,7 @@ struct dhcp_lease {
   int new_prefixlen;     /* and its prefix length */
 #ifdef HAVE_DHCP6
   struct in6_addr addr6;
-  int iaid;
+  unsigned int iaid;
   struct slaac_address {
     struct in6_addr addr;
     time_t ping_time;
@@ -768,8 +776,9 @@ struct dhcp_config {
   unsigned char *clid;   /* clientid */
   char *hostname, *domain;
   struct dhcp_netid_list *netid;
+  struct dhcp_netid *filter;
 #ifdef HAVE_DHCP6
-  struct in6_addr addr6;
+  struct addrlist *addr6;
 #endif
   struct in_addr addr;
   time_t decline_time;
@@ -791,7 +800,6 @@ struct dhcp_config {
 #define CONFIG_DECLINED       1024    /* address declined by client */
 #define CONFIG_BANK           2048    /* from dhcp hosts file */
 #define CONFIG_ADDR6          4096
-#define CONFIG_WILDCARD       8192
 #define CONFIG_ADDR6_HOSTS   16384    /* address added by from /etc/hosts */
 
 struct dhcp_opt {
@@ -879,14 +887,6 @@ struct cond_domain {
   struct cond_domain *next;
 }; 
 
-#ifdef OPTION6_PREFIX_CLASS 
-struct prefix_class {
-  int class;
-  struct dhcp_netid tag;
-  struct prefix_class *next;
-};
-#endif
-
 struct ra_interface {
   char *name;
   char *mtu_name;
@@ -964,6 +964,8 @@ struct tftp_transfer {
   unsigned int block, blocksize, expansion;
   off_t offset;
   union mysockaddr peer;
+  union all_addr source;
+  int if_index;
   char opt_blocksize, opt_transize, netascii, carrylf;
   struct tftp_file *file;
   struct tftp_transfer *next;
@@ -1061,13 +1063,11 @@ extern struct daemon {
   unsigned int duid_enterprise, duid_config_len;
   unsigned char *duid_config;
   char *dbus_name;
+  char *ubus_name;
   char *dump_file;
   int dump_mask;
   unsigned long soa_sn, soa_refresh, soa_retry, soa_expiry;
   u32 metrics[__METRIC_MAX];
-#ifdef OPTION6_PREFIX_CLASS 
-  struct prefix_class *prefix_classes;
-#endif
 #ifdef HAVE_DNSSEC
   struct ds_config *ds;
   char *timestamp_file;
@@ -1110,7 +1110,7 @@ extern struct daemon {
   int inotifyfd;
 #endif
 #if defined(HAVE_LINUX_NETWORK)
-  int netlinkfd;
+  int netlinkfd, kernel_version;
 #elif defined(HAVE_BSD_NETWORK)
   int dhcp_raw_fd, dhcp_icmp_fd, routefd;
 #endif
@@ -1288,9 +1288,12 @@ int memcmp_masked(unsigned char *a, unsigned char *b, int len,
 int expand_buf(struct iovec *iov, size_t size);
 char *print_mac(char *buff, unsigned char *mac, int len);
 int read_write(int fd, unsigned char *packet, int size, int rw);
-
+void close_fds(long max_fd, int spare1, int spare2, int spare3);
 int wildcard_match(const char* wildcard, const char* match);
 int wildcard_matchn(const char* wildcard, const char* match, int num);
+#ifdef HAVE_LINUX_NETWORK
+int kernel_version(void);
+#endif
 
 /* log.c */
 void die(char *message, char *arg1, int exit_code) ATTRIBUTE_NORETURN;
@@ -1322,7 +1325,7 @@ void receive_query(struct listener *listen, time_t now);
 unsigned char *tcp_request(int confd, time_t now,
 			   union mysockaddr *local_addr, struct in_addr netmask, int auth_dns);
 void server_gone(struct server *server);
-struct frec *get_new_frec(time_t now, int *wait, int force);
+struct frec *get_new_frec(time_t now, int *wait, struct frec *force);
 int send_from(int fd, int nowild, char *packet, size_t len, 
 	       union mysockaddr *to, union all_addr *source,
 	       unsigned int iface);
@@ -1397,14 +1400,15 @@ struct dhcp_lease *lease4_allocate(struct in_addr addr);
 #ifdef HAVE_DHCP6
 struct dhcp_lease *lease6_allocate(struct in6_addr *addrp, int lease_type);
 struct dhcp_lease *lease6_find(unsigned char *clid, int clid_len, 
-			       int lease_type, int iaid, struct in6_addr *addr);
+			       int lease_type, unsigned int iaid, struct in6_addr *addr);
 void lease6_reset(void);
-struct dhcp_lease *lease6_find_by_client(struct dhcp_lease *first, int lease_type, unsigned char *clid, int clid_len, int iaid);
+struct dhcp_lease *lease6_find_by_client(struct dhcp_lease *first, int lease_type,
+					 unsigned char *clid, int clid_len, unsigned int iaid);
 struct dhcp_lease *lease6_find_by_addr(struct in6_addr *net, int prefix, u64 addr);
 u64 lease_find_max_addr6(struct dhcp_context *context);
 void lease_ping_reply(struct in6_addr *sender, unsigned char *packet, char *interface);
 void lease_update_slaac(time_t now);
-void lease_set_iaid(struct dhcp_lease *lease, int iaid);
+void lease_set_iaid(struct dhcp_lease *lease, unsigned int iaid);
 void lease_make_duid(time_t now);
 #endif
 void lease_set_hwaddr(struct dhcp_lease *lease, const unsigned char *hwaddr,
@@ -1522,8 +1526,7 @@ int get_incoming_mark(union mysockaddr *peer_addr, union all_addr *local_addr,
 void dhcp6_init(void);
 void dhcp6_packet(time_t now);
 struct dhcp_context *address6_allocate(struct dhcp_context *context,  unsigned char *clid, int clid_len, int temp_addr,
-				       int iaid, int serial, struct dhcp_netid *netids, int plain_range, struct in6_addr *ans);
-int config_valid(struct dhcp_config *config, struct dhcp_context *context, struct in6_addr *addr);
+				       unsigned int iaid, int serial, struct dhcp_netid *netids, int plain_range, struct in6_addr *ans);
 struct dhcp_context *address6_available(struct dhcp_context *context, 
 					struct in6_addr *taddr,
 					struct dhcp_netid *netids,
@@ -1533,7 +1536,7 @@ struct dhcp_context *address6_valid(struct dhcp_context *context,
 				    struct dhcp_netid *netids,
 				    int plain_range);
 struct dhcp_config *config_find_by_address6(struct dhcp_config *configs, struct in6_addr *net, 
-					    int prefix, u64 addr);
+					    int prefix, struct in6_addr *addr);
 void make_duid(time_t now);
 void dhcp_construct_contexts(time_t now);
 void get_client_mac(struct in6_addr *client, int iface, unsigned char *mac, 
@@ -1570,7 +1573,8 @@ struct dhcp_config *find_config(struct dhcp_config *configs,
 				struct dhcp_context *context,
 				unsigned char *clid, int clid_len,
 				unsigned char *hwaddr, int hw_len, 
-				int hw_type, char *hostname);
+				int hw_type, char *hostname,
+				struct dhcp_netid *filter);
 int config_has_mac(struct dhcp_config *config, unsigned char *hwaddr, int len, int type);
 #ifdef HAVE_LINUX_NETWORK
 char *whichdevice(void);

@@ -202,7 +202,7 @@ function add_group(flag, target){
 		return false;
 	}
 
-	var alert_str = validator.hostName(document.getElementById("group_name"));
+	var alert_str = validator.account_name(document.getElementById("group_name"));
 
 	if(alert_str != ""){
 		alert(alert_str);

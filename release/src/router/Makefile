@@ -722,6 +722,14 @@ obj-$(RTCONFIG_LETSENCRYPT) += socat
 #obj-$(RTCONFIG_SYSSTATE) += sysstate
 obj-y += sysstate
 
+obj-$(RTCONFIG_LIBASC) += libasc
+
+obj-$(RTCONFIG_AHS) += openssl
+obj-$(RTCONFIG_AHS) += $(CURL)
+obj-$(RTCONFIG_AHS) += json-c
+obj-$(RTCONFIG_AHS) += ahs
+
+obj-$(RTCONFIG_ASD) += asd
 obj-$(RTCONFIG_OPENVPN) += openssl
 obj-$(RTCONFIG_OPENVPN) += libvpn
 
@@ -826,6 +834,7 @@ ifeq ($(RTCONFIG_AMAS),y)
 obj-y  += jansson-2.7
 obj-y  += libevent-2.0.21
 obj-y  += lldpd-0.9.8
+obj-y  += libxml2
 endif
 
 .PHONY: emf$(BCMEX)$(EX7) igs$(BCMEX)$(EX7) hspot_ap$(BCMEX)$(EX7) wps$(BCMEX)$(EX7)
@@ -872,12 +881,10 @@ obj-y += scsi-idle
 endif
 obj-y += libusb10
 obj-y += libusb
-obj-y += libusb-0.1.12
-ifeq ($(RTCONFIG_USB),y)
 ifneq ($(RTCONFIG_8M_SFP),y)
 obj-y += hub-ctrl
 endif
-endif
+obj-$(RTCONFIG_USB_PRINTER) += libusb-0.1.12
 obj-$(RTCONFIG_USB_PRINTER) += u2ec
 obj-$(RTCONFIG_USB_PRINTER) += LPRng
 
@@ -3364,36 +3371,37 @@ libupnp-1.3.1/Makefile: libupnp-1.3.1/Makefile.in
 		$(CONFIGURE) --prefix=/usr --disable-dependency-tracking \
 	)
 
-libusb10/stamp-h1:
-	cd libusb10 && CFLAGS="-Os -Wall $(EXTRACFLAGS)" LIBS="-lpthread -ldl -lc $(EXTRALDFLAGS)" \
-	$(CONFIGURE) --enable-shared --prefix=/usr ac_cv_lib_rt_clock_gettime=no
-	-@$(MAKE) -C libusb10 clean
-	touch $@
+libusb10/Makefile:
+	cd libusb10 && \
+	$(CONFIGURE) --enable-shared --prefix=/usr --disable-udev \
+		CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+		LIBS="-lpthread -ldl -lc $(EXTRALDFLAGS)" \
+		ac_cv_lib_rt_clock_gettime=no
 
-libusb10: libusb10/stamp-h1
+libusb10: libusb10/Makefile
 	$(MAKE) -C $@
 
 libusb10-install: libusb10
-	install -D libusb10/libusb/.libs/libusb-1.0.so.0.0.0 $(INSTALLDIR)/libusb10/usr/lib/libusb-1.0.so.0
+	install -D libusb10/libusb/.libs/libusb-1.0.so.0.2.0 $(INSTALLDIR)/libusb10/usr/lib/libusb-1.0.so.0
 	$(STRIP) $(INSTALLDIR)/libusb10/usr/lib/*.so.*
 	cd $(INSTALLDIR)/libusb10/usr/lib && \
-		ln -sf libusb-1.0.so.0 libusb-1.0.so.0.0.0 && \
+		ln -sf libusb-1.0.so.0 libusb-1.0.so.0.2.0 && \
 		ln -sf libusb-1.0.so.0 libusb-1.0.so
 
 libusb10-clean:
-	-@$(MAKE) -C libusb10 clean
-	@rm -f libusb10/stamp-h1
+	[ ! -f libusb10/Makefile ] || $(MAKE) -C libusb10 distclean
+	@rm -f libusb10/Makefile
 
-libusb/stamp-h1:
-	cd libusb && CFLAGS="-Wall -Os $(EXTRACFLAGS)" LIBS="-lpthread -ldl -lc $(EXTRALDFLAGS)" \
-	$(CONFIGURE) --prefix=/usr \
+libusb/Makefile:
+	cd libusb && \
+	$(CONFIGURE) --enable-shared --prefix=/usr \
+		CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+		LIBS="-lpthread -ldl -lc $(EXTRALDFLAGS)" \
 		LIBUSB_1_0_CFLAGS="-I$(TOP)/libusb10/libusb" \
 		LIBUSB_1_0_LIBS="-L$(TOP)/libusb10/libusb/.libs -lusb-1.0 \
 		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share"
-	-@$(MAKE) -C libusb clean
-	touch $@
 
-libusb: libusb10 libusb/stamp-h1
+libusb: libusb10 libusb/Makefile
 	$(MAKE) -C $@
 
 libusb-install: libusb
@@ -3404,8 +3412,8 @@ libusb-install: libusb
 		ln -sf libusb-0.1.so.4 libusb.so
 
 libusb-clean:
-	-@$(MAKE) -C libusb clean
-	@rm -f libusb/stamp-h1
+	[ ! -f libusb/Makefile ] || $(MAKE) -C libusb distclean
+	@rm -f libusb/Makefile
 
 usb-modeswitch-1.2.3: libusb
 	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) -I$(TOP)/libusb/libusb" LIBS="\
@@ -4820,6 +4828,32 @@ sysstate-clean:
 sysstate-install:
 	echo "install sysstate"
 	$(MAKE) -C sysstate install
+
+ahs: libasc json-c
+	@$(SEP)
+	echo "build ahs"
+	$(MAKE) -C ahs
+
+ahs-clean:
+	echo "clean ahs"
+	$(MAKE) -C ahs clean
+
+ahs-install:
+	echo "install ahs"
+	$(MAKE) -C ahs install
+
+libasc: openssl $(CURL)
+	@$(SEP)
+	echo "build libasc"
+	$(MAKE) -C libasc
+
+libasc-clean:
+	echo "clean libasc"
+	$(MAKE) -C libasc clean
+
+libasc-install:
+	echo "install libasc"
+	$(MAKE) -C libasc install
 
 qsr10g_image:
 aqr107_image:
@@ -6521,6 +6555,8 @@ wget-clean:
 wget-install:
 	install -D wget/src/wget $(INSTALLDIR)/wget/usr/sbin/wget
 	$(STRIP) $(INSTALLDIR)/wget/usr/sbin/wget
+	install -d $(INSTALLDIR)/wget/rom/etc
+	echo "ca_certificate=/etc/ssl/certs/ca-certificates.crt" > $(INSTALLDIR)/wget/rom/etc/wgetrc
 
 rtk_wifi_eventd: $(if $(RTCONFIG_CFGSYNC), cfg_mnt)
 
@@ -7108,6 +7144,18 @@ sysstat-10.0.3-install:
 	$(MAKE) -C sysstat-10.0.3 install_base DESTDIR=$(INSTALLDIR)/sysstat-10.0.3 INSTALL_DOC=n
 	mv $(INSTALLDIR)/sysstat-10.0.3/etc $(INSTALLDIR)/sysstat-10.0.3/etc_sysstat
 	rm -rf $(INSTALLDIR)/sysstat-10.0.3/var
+
+asd: shared nvram$(BCMEX)$(EX7) $(CURL) openssl libasc
+	$(MAKE) -C $@
+
+asd-install:
+	install -D asd/asd $(INSTALLDIR)/asd/usr/bin/asd
+	$(STRIP) $(INSTALLDIR)/asd/usr/bin/asd
+
+asd-clean:
+	$(MAKE) -C asd clean
+
+
 #
 # tunnel related
 #

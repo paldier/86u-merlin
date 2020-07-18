@@ -157,7 +157,7 @@ void check_wan_nvram(void){
 	if(nvram_match("wan1_proto", "")) nvram_set("wan1_proto", "dhcp");
 }
 #else
-int add_multi_routes(void){
+int add_multi_routes(int check_link){
 	int unit;
 	char tmp[100], prefix[] = "wanXXXXXXXXXX_";
 	char wan_proto[32];
@@ -166,6 +166,7 @@ int add_multi_routes(void){
 	int debug = nvram_get_int("routes_debug");
 	int lock;
 	lock = file_lock("mt_routes");
+_dprintf("add_multi_routes: running...\n");
 
 	// clean the rules of routing table and re-build them then.
 	system("ip rule flush");
@@ -185,8 +186,10 @@ int add_multi_routes(void){
 		snprintf(wan_multi_gate[unit], sizeof(wan_multi_gate[unit]), "%s", nvram_safe_get(strcat_r(prefix, "gateway", tmp)));
 
 		// when wan_down().
-		if(!is_wan_connect(unit))
+		if(check_link && !is_wan_connect(unit)){
+_dprintf("add_multi_routes: skip because of the result of is_wan_connect(%d)...\n", unit);
 			continue;
+		}
 
 		snprintf(cmd, sizeof(cmd), "ip route replace %s dev %s proto kernel", wan_multi_gate[unit], wan_multi_if[unit]);
 if(debug) printf("test 10. cmd=%s.\n", cmd);
@@ -1035,20 +1038,18 @@ _dprintf("start_wan_if: USB modem is scanning...\n");
 		}
 
 		TRACE_PT("3g begin.\n");
-		if(nvram_match("g3err_pin", "1")){
+		update_wan_state(prefix, WAN_STATE_CONNECTING, WAN_STOPPED_REASON_NONE);
+
+		putenv(env_unit);
+		eval("/usr/sbin/find_modem_type.sh");
+		unsetenv("unit");
+		snprintf(modem_type, sizeof(modem_type), "%s", nvram_safe_get(strcat_r(prefix2, "act_type", tmp2)));
+
+		if(nvram_match("g3err_pin", "1")
+				&& strcmp(modem_type, "rndis")){ // Android phone's shared network don't need to check SIM
 			TRACE_PT("3g end: PIN error previously!\n");
 			update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_PINCODE_ERR);
 			return;
-		}
-
-		update_wan_state(prefix, WAN_STATE_CONNECTING, WAN_STOPPED_REASON_NONE);
-
-		snprintf(modem_type, sizeof(modem_type), "%s", nvram_safe_get(strcat_r(prefix2, "act_type", tmp2)));
-		if(strlen(modem_type) <= 0){
-			putenv(env_unit);
-			eval("/usr/sbin/find_modem_type.sh");
-			unsetenv("unit");
-			snprintf(modem_type, sizeof(modem_type), "%s", nvram_safe_get(strcat_r(prefix2, "act_type", tmp2)));
 		}
 
 		if(!strcmp(modem_type, "tty") || !strcmp(modem_type, "qmi") || !strcmp(modem_type, "mbim") || !strcmp(modem_type, "gobi")){
@@ -1105,24 +1106,26 @@ _dprintf("start_wan_if: USB modem is scanning...\n");
 			_eval(modem_argv, ">>/tmp/usb.log", 0, NULL);
 			unsetenv("unit");
 
-			if(nvram_match("g3err_pin", "1")){
-				TRACE_PT("3g end: PIN error!\n");
-				update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_PINCODE_ERR);
-				return;
-			}
-
-			snprintf(tmp, sizeof(tmp), "%s", nvram_safe_get(strcat_r(prefix2, "act_sim", tmp2)));
-			if(strlen(tmp) > 0){
-				sim_state = atoi(tmp);
-				if(sim_state == 2 || sim_state == 3){
-					TRACE_PT("3g end: Need to input PIN or PUK.\n");
+			if(strcmp(modem_type, "rndis")){ // Android phone's shared network don't need to check SIM
+				if(nvram_match("g3err_pin", "1")){
+					TRACE_PT("3g end: PIN error!\n");
 					update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_PINCODE_ERR);
 					return;
 				}
-				else if(sim_state != 1){
-					TRACE_PT("3g end: SIM isn't ready.\n");
-					update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_NONE);
-					return;
+
+				snprintf(tmp, sizeof(tmp), "%s", nvram_safe_get(strcat_r(prefix2, "act_sim", tmp2)));
+				if(strlen(tmp) > 0){
+					sim_state = atoi(tmp);
+					if(sim_state == 2 || sim_state == 3){
+						TRACE_PT("3g end: Need to input PIN or PUK.\n");
+						update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_PINCODE_ERR);
+						return;
+					}
+					else if(sim_state != 1){
+						TRACE_PT("3g end: SIM isn't ready.\n");
+						update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_NONE);
+						return;
+					}
 				}
 			}
 		}
@@ -2039,7 +2042,7 @@ int update_resolvconf(void)
 				if (dnspriv_enable)
 					break;
 #endif
-#ifdef RTCONFIG_OPENVPN
+#if defined(RTCONFIG_OPENVPN) && !defined(RTCONFIG_VPN_FUSION)
 				if (write_ovpn_resolv_dnsmasq(fp_servers))
 					break;
 #endif
@@ -2049,7 +2052,9 @@ int update_resolvconf(void)
 					break;
 #endif
 				foreach(tmp, (*wan_dns ? wan_dns : wan_xdns), next)
-					fprintf(fp_servers, "server=%s\n", tmp);
+				{
+ 					fprintf(fp_servers, "server=%s\n", tmp);
+				}
 			} while (0);
 
 			wan_domain = nvram_safe_get_r(strcat_r(prefix, "domain", tmp), wan_domain_buf, sizeof(wan_domain_buf));
@@ -2623,7 +2628,7 @@ wan_up(const char *pwan_ifname)
 	update_resolvconf();
 
 	/* default route via default gateway */
-	add_multi_routes();
+	add_multi_routes(0);
 
 	/* Kick syslog to re-resolve remote server */
 	reload_syslogd();
@@ -2663,6 +2668,10 @@ wan_up(const char *pwan_ifname)
 
 	/* Sync time */
 	refresh_ntpc();
+
+#ifdef RTCONFIG_VPN_FUSION
+	vpnc_set_internet_policy(1);
+#endif
 
 #if !defined(RTCONFIG_MULTIWAN_CFG)
 	if (wan_unit != wan_primary_ifunit()
@@ -2945,7 +2954,7 @@ wan_down(char *wan_ifname)
 
 #ifdef RTCONFIG_DUALWAN
 	if(nvram_match("wans_mode", "lb"))
-		add_multi_routes();
+		add_multi_routes(1);
 #endif
 
 #ifdef RTCONFIG_GETREALIP
@@ -2960,6 +2969,10 @@ wan_down(char *wan_ifname)
 #ifdef RTCONFIG_LANTIQ
 	disable_ppa_wan(wan_ifname);
 #endif
+#ifdef RTCONFIG_VPN_FUSION
+	vpnc_set_internet_policy(0);
+#endif
+
 }
 
 int
@@ -3400,7 +3413,6 @@ start_wan(void)
 #endif
 #endif // RTCONFIG_DUALWAN
 
-	sleep(1); // let wanduck's detect not be close with start_wan().
 	nvram_set("wanduck_start_detect", "1");
 
 #ifdef RTCONFIG_MULTICAST_IPTV
@@ -3724,8 +3736,11 @@ int autodet_main(int argc, char *argv[]){
 		}
 
 		if(nvram_get_int(strcat_r(prefix2, "state", tmp2)) == AUTODET_STATE_FINISHED_WITHPPPOE
-				|| nvram_get_int(strcat_r(prefix2, "auxstate", tmp2)) == AUTODET_STATE_FINISHED_WITHPPPOE)
+				|| nvram_get_int(strcat_r(prefix2, "auxstate", tmp2)) == AUTODET_STATE_FINISHED_WITHPPPOE){
+			nvram_set_int(strcat_r(prefix2, "state", tmp2), AUTODET_STATE_FINISHED_OK);
+			nvram_set_int(strcat_r(prefix2, "auxstate", tmp2), AUTODET_STATE_FINISHED_WITHPPPOE);
 			continue;
+		}
 
 		nvram_set_int(strcat_r(prefix2, "state", tmp2), AUTODET_STATE_INITIALIZING);
 		nvram_set_int(strcat_r(prefix2, "auxstate", tmp2), AUTODET_STATE_INITIALIZING);
@@ -3858,7 +3873,6 @@ int autodet_main(int argc, char *argv[]){
 			nvram_set_int(strcat_r(prefix, "_state", tmp), AUTODET_STATE_FINISHED_OK);
 	}
 #endif
-
 	nvram_set("autodet_proceeding", "0");//Cherry Cho added for httpd checking in 2016/4/22.
 
 	return 0;

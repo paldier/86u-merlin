@@ -372,14 +372,12 @@ static int rctest_main(int argc, char *argv[])
 		sscanf(argv[3], "%x", &ctrl);
 		_dprintf("phy_ctrl 0x%x/%x (%d)\n", mask, ctrl, set_phy_ctrl(mask, ctrl));
 	}
-#if defined(RTCONFIG_EXT_BCM53134)
 	else if (strcmp(argv[1], "set_ex53134_ctrl")==0) {
 		unsigned int mask, ctrl;
 		sscanf(argv[2], "%x", &mask);
 		sscanf(argv[3], "%x", &ctrl);
 		_dprintf("ex53134 phy_ctrl 0x%x/%x (%d)\n", mask, ctrl, set_ex53134_ctrl(mask, ctrl));
 	}
-#endif
 #endif
 	else if (strcmp(argv[1], "lanports_ctrl")==0) {
 		int val;
@@ -1221,7 +1219,7 @@ static const applets_t applets[] = {
 #endif
 	{ "firmware_check",		firmware_check_main		},
 #if defined(RTCONFIG_FRS_LIVE_UPDATE)
-#if defined(MERLINR_VER_MAJOR_B) || defined(MERLINR_VER_MAJOR_R) || defined(MERLINR_VER_MAJOR_X)
+#if defined(RTCONFIG_BCMARM) || defined(RTCONFIG_LANTIQ) || defined(RTCONFIG_QCA) || defined(RTCONFIG_RALINK) || defined(RTCONFIG_HND_ROUTER)
 	{ "firmware_check_update",	merlinr_firmware_check_update_main	},
 #else
 	{ "firmware_check_update",	firmware_check_update_main	},
@@ -1290,6 +1288,9 @@ static const applets_t applets[] = {
 #endif
 #ifdef RTCONFIG_ADTBW
 	{ "adtbw",			adtbw_main		},
+#endif
+#if defined(SBRAC1900P) || defined(SBRAC3200P) || defined(R7900P)  || defined(R8000P)
+	{ "toolbox",			merlinr_toolbox		},
 #endif
 	{NULL, NULL}
 };
@@ -1726,6 +1727,12 @@ int main(int argc, char **argv)
 		restart_wireless();
 		return 0;
 	}
+#if defined(RTCONFIG_BCMWL6) && defined(RTCONFIG_PROXYSTA)
+	else if (!strcmp(base, "sendarp")) {
+		send_arpreq();
+		return 0;
+	}
+#endif
 #ifdef RTCONFIG_BCM_7114
 	else if (!strcmp(base, "stop_wl")) {
 		stop_wl_bcm();
@@ -2092,6 +2099,12 @@ int main(int argc, char **argv)
 		return 0;
 	}
 #endif
+#ifdef RTCONFIG_INTERNETCTRL
+	else if (!strcmp(base, "ic")) {
+		ic_main(argc, argv);
+		return 0;
+	}
+#endif
 #if defined(CONFIG_BCMWL5) \
 		|| (defined(RTCONFIG_RALINK) && defined(RTCONFIG_WIRELESSREPEATER)) \
 		|| defined(RTCONFIG_QCA) || defined(RTCONFIG_REALTEK) \
@@ -2154,7 +2167,7 @@ int main(int argc, char **argv)
 	}
 #endif
 	else if (!strcmp(base, "add_multi_routes")) {
-		return add_multi_routes();
+		return add_multi_routes(0);
 	}
 	else if (!strcmp(base, "led_ctrl")) {
 		return do_led_ctrl(atoi(argv[1]), atoi(argv[2]));
@@ -2178,6 +2191,9 @@ int main(int argc, char **argv)
 	}
 	else if (!strcmp(base, "mtd_erase_image_update")) {
 		return mtd_erase_image_update();
+	}
+	else if (!strcmp(base, "mtd_erase_misc2")) {
+		return mtd_erase_misc2();
 	}
 #else
 	else if (!strcmp(base, "nvram_erase")) {

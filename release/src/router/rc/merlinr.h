@@ -34,7 +34,9 @@ extern int merlinr_firmware_check_update_main(int argc, char *argv[]);
 enum {
 	SOFTCENTER_WAN=1,
 	SOFTCENTER_NAT,
-	SOFTCENTER_MOUNT
+	SOFTCENTER_MOUNT,
+	SOFTCENTER_SERVICES,
+	SOFTCENTER_UNMOUNT
 };
 extern void softcenter_eval(int sig);
 #endif

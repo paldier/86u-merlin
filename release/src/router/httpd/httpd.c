@@ -64,6 +64,7 @@
 typedef unsigned int __u32;   // 1225 ham
 
 #include <httpd.h>
+#include <common.h>
 //2008.08 magic{
 #include <bcmnvram.h>	//2008.08 magic
 #include <arpa/inet.h>	//2008.08 magic
@@ -295,6 +296,7 @@ static int check_if_inviteCode(const char *dirpath){
 }
 #endif
 
+#ifndef RTCONFIG_LIBASUSLOG
 static int
 log_pass_handler(char *url)
 {
@@ -334,6 +336,7 @@ void Debug2File(const char *path, const char *fmt, ...)
 	} else
 		fprintf(stderr, "Open %s Error!\n", path);
 }
+#endif
 
 void sethost(char *host)
 {
@@ -584,7 +587,7 @@ send_headers( int status, char* title, char* extra_header, char* mime_type, int 
     if ( extra_header != (char*) 0 )
 	(void) fprintf( conn_fp, "%s\r\n", extra_header );
     if ( mime_type != (char*) 0 ){
-	if(fromapp != 0)
+	if(fromapp != FROM_BROWSER && fromapp != FROM_WebView)
 		(void) fprintf( conn_fp, "Content-Type: %s\r\n", "application/json;charset=UTF-8" );		
 	else
 		(void) fprintf( conn_fp, "Content-Type: %s\r\n", mime_type );
@@ -722,6 +725,8 @@ int check_user_agent(char* user_agent){
 				fromapp=FROM_IFTTT;
 			else if(strcmp( app_framework, "Alexa") == 0)
 				fromapp=FROM_ALEXA;
+			else if(strcmp( app_framework, "WebView") == 0)
+				fromapp=FROM_WebView;
 			else
 				fromapp=FROM_UNKNOWN;
 		}
@@ -1200,7 +1205,6 @@ handle_request(void)
         }
 #endif
 	HTTPD_DBG("IP(%s), file = %s\nUser-Agent: %s\n", inet_ntoa(login_usa_tmp.sa_in.sin_addr), file, user_agent);
-
 #ifdef RTCONFIG_SOFTCENTER
 	char scPath[128];
 	if ((strncmp(file, "Main_S", 6)==0) || (strncmp(file, "Module_", 7)==0))//jsp
@@ -1423,15 +1427,17 @@ handle_request(void)
 					&& !strstr(file, "asustitle.png")
 #endif
 					&& !strstr(file,"cert_key.tar")
+					&& !strstr(file,"cert.tar")
 #ifdef RTCONFIG_OPENVPN
 					&& !strstr(file, "server_ovpn.cert")
+#endif
+#ifdef RTCONFIG_CAPTCHA
+					&& !strstr(file, "captcha.gif")
 #endif
 #ifdef RTCONFIG_SOFTCENTER
 					&& !strstr(file, "ss_conf")
 					&& !strstr(file, "ss_status")
 					&& !strstr(file, "dbconf")
-					&& !strstr(file, "Main_S")
-					&& !strstr(file, "Module_")
 #endif
 					){
 				send_error( 404, "Not Found", (char*) 0, "File not found." );
@@ -2042,6 +2048,10 @@ int main(int argc, char **argv)
 	 * time_zone_x_mapping(); */
 	setenv("TZ", nvram_safe_get_x("", "time_zone_x"), 1);
 
+#ifdef RTCONFIG_LETSENCRYPT
+	nvram_unset("le_restart_httpd");
+#endif
+
 	if (nvram_get_int("HTTPD_DBG") > 0)
 		eval("touch", HTTPD_DEBUG);
 
@@ -2093,7 +2103,7 @@ int main(int argc, char **argv)
 
 #ifdef RTCONFIG_HTTPS
 	//if (do_ssl)
-		start_ssl();
+		start_ssl(http_port);
 #endif
 
 	/* Initialize listen socket */
@@ -2140,10 +2150,11 @@ int main(int argc, char **argv)
 
 	/* Loop forever handling requests */
 	for (;;) {
-		int max_fd, count;
+		const static struct timeval timeout = { .tv_sec = MAX_CONN_TIMEOUT, .tv_usec = 0 };
 		struct timeval tv;
 		fd_set rfds;
 		conn_item_t *item, *next;
+		int max_fd, count;
 
 		memcpy(&rfds, &active_rfds, sizeof(rfds));
 		max_fd = -1;
@@ -2159,8 +2170,7 @@ int main(int argc, char **argv)
 			max_fd = max(item->fd, max_fd);
 
 		/* Wait for new connection or incoming request */
-		tv.tv_sec = MAX_CONN_TIMEOUT;
-		tv.tv_usec = 0;
+		tv = timeout;
 		while ((count = select(max_fd + 1, &rfds, NULL, NULL, &tv)) < 0 && errno == EINTR)
 			continue;
 		if (count < 0) {
@@ -2190,6 +2200,10 @@ int main(int argc, char **argv)
 				free(item);
 				continue;
 			}
+
+			/* Set receive/send timeouts */
+			setsockopt(item->fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+			setsockopt(item->fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
 			/* Set the KEEPALIVE option to cull dead connections */
 			setsockopt(item->fd, SOL_SOCKET, SO_KEEPALIVE, &int_1, sizeof(int_1));
@@ -2284,20 +2298,30 @@ void erase_cert(void)
 	unlink("/etc/cert.pem");
 	unlink("/etc/key.pem");
 	nvram_unset("https_crt_file");
-	//nvram_unset("https_crt_gen");
 	nvram_set("https_crt_gen", "0");
 }
 
-void start_ssl(void)
+void start_ssl(int http_port)
 {
+	int lock;
 	int ok;
 	int save;
+	int i;
 	int retry;
 	unsigned long long sn;
 	char t[32];
 
-	//fprintf(stderr,"[httpd] start_ssl running!!\n");
-	//nvram_set("https_crt_gen", "1");
+	lock = file_lock("httpd");
+
+	// Avoid collisions if another httpd instance is initializing SSL cert
+	for (i = 1; i < 5; i++) {
+		if (lock < 0) {
+			//logmessage("httpd", "Conflict, waiting %d", i);
+			sleep(i*i);
+		} else {
+			i = 5;
+		}
+	}
 
 	if (nvram_match("https_crt_gen", "1")) {
 		erase_cert();
@@ -2310,10 +2334,11 @@ void start_ssl(void)
 		if ((!f_exists("/etc/cert.pem")) || (!f_exists("/etc/key.pem"))) {
 			ok = 0;
 			if (save) {
-				fprintf(stderr, "Save SSL certificate...\n"); // tmp test
+				logmessage("httpd", "Save SSL certificate...%d", http_port);
 				if (nvram_get_file("https_crt_file", "/tmp/cert.tgz", 8192)) {
 					if (eval("tar", "-xzf", "/tmp/cert.tgz", "-C", "/", "etc/cert.pem", "etc/key.pem") == 0){
 						system("cat /etc/key.pem /etc/cert.pem > /etc/server.pem");
+						system("cp /etc/cert.pem /etc/cert.crt"); // openssl self-signed certificate for router.asus.com LAN access
 						ok = 1;
 					}
 
@@ -2327,8 +2352,7 @@ void start_ssl(void)
 			}
 			if (!ok) {
 				erase_cert();
-				syslog(LOG_NOTICE, "Generating SSL certificate...");
-				fprintf(stderr, "Generating SSL certificate...\n"); // tmp test
+				logmessage("httpd", "Generating SSL certificate...%d", http_port);
 				// browsers seems to like this when the ip address moves...	-- zzz
 				f_read("/dev/urandom", &sn, sizeof(sn));
 
@@ -2341,11 +2365,20 @@ void start_ssl(void)
 			save_cert();
 		}
 
-		if (mssl_init("/etc/cert.pem", "/etc/key.pem")) return;
+		if (mssl_init("/etc/cert.pem", "/etc/key.pem")) {
+			logmessage("httpd", "Succeed to init SSL certificate...%d", http_port);
+			file_unlock(lock);
+			return;
+		}
 
+		logmessage("httpd", "Failed to initialize SSL, generating new key/cert...%d", http_port);
 		erase_cert();
 
-		if (!retry) exit(1);
+		if (!retry) {
+			logmessage("httpd", "Unable to start in SSL mode, exiting! %d", http_port);
+			file_unlock(lock);
+			exit(1);
+		}
 		retry = 0;
 	}
 }
@@ -2363,5 +2396,4 @@ int check_current_ip_is_lan_or_wan()
 
 	return (lan & mask) == (login_ip_tmp & mask);
 }
-
 

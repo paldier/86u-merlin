@@ -1,0 +1,10 @@
+﻿QIS_welcome_feature1=5 ГГц прискорює до 2167 Мб/сек., а 2.4 ГГц – до 750 Мб/сек. для відтворення 4К відео і безшовної передачі на ПК Xbox One і PlayStation.
+QIS_welcome_feature2=Два високошвидкісні і потужні порти USB для мережевого файлового сховища даних та з підтримкою багатофункціональних принтерів.
+QIS_welcome_feature3=AiProtection з Trend Micro™ －моніторинг мережі в реальному часі та повна безпека.
+QIS_welcome_feature4=Висока ефективність для завантажень з мережі, ігор, великої кількості клієнтських підключень.
+PPTP_desc2=Для користування сервером VPN, будь ласка, виконуйте наступні кроки.<br>(1) Активуйте сервер PPTP VPN<br>(2) Вкажіть пул ІР для ІР клієнтів. (Максимум 30 клієнтів)<br>(3)Вкажіть ім\'я користувача і пароль для клієнта VPN/<br>(4) Відкрийте програму підключення VPN на комп'ютері або смартфоні.<br>(5) Додайте нове підключення PPTP VPN, і адреса сервера VPN буде
+vpn_max_clients=Сервер VPN дозволяє максимум 30 клієнтів!
+vpn_maximum_clients=Максимум 30 клієнтів
+WLANConfig11b_display2_sectiondesc=The function does not support [ WPA2-Enterprise, WPA-Auto-Enterprise ] security authentication method.
+VPN_Fusion=Ф‘южн VPN
+VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Ф‘южн VPN - Розповсюджені питання</a>

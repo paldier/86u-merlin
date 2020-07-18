@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <html xmlns:v>
 <head>
@@ -505,6 +505,7 @@ function detect_update(){
 		}
 		else{
 			document.start_update.action_mode.value="apply";
+			document.start_update.webs_update_trigger.value="AFC.asp";
 			document.start_update.action_script.value="start_webs_update";
 			document.start_update.submit();
 		}
@@ -517,6 +518,7 @@ function detect_update(){
 				((first_link_status == "2" && first_link_auxstatus == "0") || (first_link_status == "2" && first_link_auxstatus == "2")) ||
 				((secondary_link_status == "2" && secondary_link_auxstatus == "0") || (secondary_link_status == "2" && secondary_link_auxstatus == "2"))){
 		document.start_update.action_mode.value="apply";
+		document.start_update.webs_update_trigger.value="AFC.asp";
 		document.start_update.action_script.value="start_webs_update";
 		document.getElementById('update_states').style.display="";
 		document.getElementById('update_states').innerHTML="<#check_proceeding#>";
@@ -1001,7 +1003,7 @@ function check_fw_relese_note_status() {
 			success: function() {
 				switch(cfg_note) {
 					case "0" :
-						check_fw_relese_note_status();
+						setTimeout(function(){check_fw_release_note_status();}, 1000);
 						break;
 					case "1" :
 						show_fw_relese_note_result(true);
@@ -1015,16 +1017,18 @@ function check_fw_relese_note_status() {
 		});
 	}
 }
-function show_fw_relese_note_result(_status) {
-	if($(".confirm_block").children().find("#status_iframe").contents().find("#amas_relese_note").length == 0)
-		show_fw_relese_note_result(_status);
+function show_fw_release_note_result(_status) {
+	/*if($(".confirm_block").children().find("#status_iframe").contents().find("#amas_release_note").length == 0)
+		show_fw_release_note_result(_status);*/
 
 	if(_status) {
-		$(".confirm_block").children().find("#status_iframe").attr("src", "get_release_note_amas.asp");//reload
+		$(".confirm_block").children().find("#status_iframe").attr("src", "get_release_note_amas.asp?flag=1");//reload and flag_show
+		$(".confirm_block").children().find("#status_iframe").load();
+		/*
 		$(".confirm_block").children().find("#status_iframe").load(function() {
-			$(".confirm_block").children().find("#status_iframe").contents().find("#amas_relese_note").css("display", "");
-			$(".confirm_block").children().find("#status_iframe").contents().find("#amas_relese_note_hint").css("display", "none");
-		});
+			$(".confirm_block").children().find("#status_iframe").contents().find("#amas_release_note").css("display", "");
+			$(".confirm_block").children().find("#status_iframe").contents().find("#amas_release_note_hint").css("display", "none");
+		});*/
 	}
 	else
 		$(".confirm_block").children().find("#status_iframe").contents().find("#amas_relese_note_hint").val("Fail to grab release note");/* untranslated */
@@ -1350,3 +1354,4 @@ function check_AiMesh_fw_version(_fw) {
 </form>
 </body>
 </html>
+

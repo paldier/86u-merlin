@@ -67,6 +67,8 @@ void merlinr_init()
 	nvram_set("sc_wan_sig", "0");
 	nvram_set("sc_nat_sig", "0");
 	nvram_set("sc_mount_sig", "0");
+	nvram_set("sc_unmount_sig", "0");
+	nvram_set("sc_services_sig", "0");	
 #endif
 #if defined(TUFAX3000)
 //only an idiot would use 160 in china
@@ -79,13 +81,15 @@ void merlinr_init_done()
 {
 	_dprintf("############################ MerlinR init done #################################\n");
 #ifdef RTCONFIG_SOFTCENTER
-	if (!f_exists("/jffs/softcenter/scripts/ks_tar_intall.sh") && nvram_match("sc_mount","0")){
+	if (!f_exists("/jffs/softcenter/scripts/ks_tar_install.sh") && nvram_match("sc_mount","0")){
 		doSystem("/usr/sbin/jffsinit.sh &");
-		logmessage("软件中心", "开始安装......");
-		logmessage("软件中心", "1分钟后完成安装");
+		logmessage("Softcenter/软件中心", "Installing/开始安装......");
+		logmessage("Softcenter/软件中心", "Wait a minute/1分钟后完成安装");
 		_dprintf("....softcenter ok....\n");
-	} else if (f_exists("/jffs/softcenter/scripts/ks_tar_intall.sh") && nvram_match("sc_mount","0"))
+	} else if (f_exists("/jffs/softcenter/scripts/ks_tar_install.sh") && nvram_match("sc_mount","0"))
 		nvram_set("sc_installed","1");
+	//else if (!f_exists("/jffs/softcenter/scripts/ks_tar_intall.sh") && nvram_match("sc_mount","1"))
+		//nvram_set("sc_installed","0");
 	if(f_exists("/jffs/.asusrouter")){
 		unlink("/jffs/.asusrouter");
 		doSystem("sed -i '/softcenter-wan.sh/d' /jffs/scripts/wan-start");
@@ -93,6 +97,7 @@ void merlinr_init_done()
 		doSystem("sed -i '/softcenter-mount.sh/d' /jffs/scripts/post-mount");
 
 	}
+	doSystem("dbus set softcenter_firmware_version=`nvram get extendno|cut -d \"_\" -f2|cut -d \"-\" -f1|cut -c2-6`");
 #endif
 #if defined(RTCONFIG_QCA)
 	if(!nvram_get("bl_ver"))
@@ -160,9 +165,12 @@ void merlinr_init_done()
 #if defined(TUFAX3000) && defined(MERLINR_VER_MAJOR_X)
 //tufax3000=ax82u,ax58u=ax3000
 	//enable_4t4r();
-#endif
-#if defined(MERLINR_VER_MAJOR_X) && defined(RTAC86U)
+#elif defined(MERLINR_VER_MAJOR_X) && defined(RTAC86U)
 	merlinr_patch_nvram();
+#elif defined(GTAC2900) && defined(MERLINR_VER_MAJOR_X)
+//ac86u <--> gtac2900
+	patch_ac86();
+	//patch_gt2900();
 #endif
 }
 
@@ -352,6 +360,10 @@ int merlinr_firmware_check_update_main(int argc, char *argv[])
 	nvram_set("webs_state_error", "0");
 	nvram_set("webs_state_odm", "0");
 	nvram_set("webs_state_url", "");
+#ifdef RTCONFIG_AMAS
+	nvram_set("cfg_check", "0");
+	nvram_set("cfg_upgrade", "0");
+#endif
 	unlink("/tmp/webs_upgrade.log");
 	unlink("/tmp/wlan_update.txt");
 	unlink("/tmp/release_note0.txt");
@@ -362,10 +374,10 @@ int merlinr_firmware_check_update_main(int argc, char *argv[])
 	curlhandle = curl_easy_init();
 	snprintf(url, sizeof(url), "%s/%s", serverurl, serverupdate);
 	//snprintf(log, sizeof(log), "echo \"[FWUPDATE]---- update dl_path_info for general %s/%s ----\" >> /tmp/webs_upgrade.log", serverurl, serverupdate);
+	FWUPDATE_DBG("---- update dl_path_info for general %s/%s ----", serverurl, serverupdate);
 	download=curl_download_file(curlhandle , url,localupdate,8,3);
 	//system(log);
-	FWUPDATE_DBG("---- update dl_path_info for general %s/%s ----", serverurl, serverupdate);
-	_dprintf("%d\n",download);
+	//_dprintf("%d\n",download);
 	if(download)
 	{
 		fpupdate = fopen(localupdate, "r");
@@ -381,8 +393,10 @@ int merlinr_firmware_check_update_main(int argc, char *argv[])
 					//_dprintf("%s#%s\n",fwver,cur_fwver);
 					if(versioncmp((cur_fwver+1),(fwver+1))==1){
 						nvram_set("webs_state_url", "");
-#if defined(SBRAC3200P) || defined(RTACRH17) || defined(RTAC3200) || defined(RTAC85P)
+#if defined(RTACRH17) || defined(RTAC3200) || defined(RTAC85P)
 						snprintf(info,sizeof(info),"3004_382_%s_%s-%s",modelname,fwver,tag);
+#elif defined(RTAC68U) || defined(RTAC3100) || defined(RTAC88U)
+						snprintf(info,sizeof(info),"3004_385_%s_%s-%s",modelname,fwver,tag);
 #else
 						snprintf(info,sizeof(info),"3004_384_%s_%s-%s",modelname,fwver,tag);
 #endif
@@ -392,7 +406,10 @@ int merlinr_firmware_check_update_main(int argc, char *argv[])
 						nvram_set("webs_state_REQinfo", info);
 						nvram_set("webs_state_flag", "1");
 						nvram_set("webs_state_update", "1");
-
+#ifdef RTCONFIG_AMAS
+//						nvram_set("cfg_check", "9");
+//						nvram_set("cfg_upgrade", "0");
+#endif
 						memset(url,'\0',sizeof(url));
 						memset(log,'\0',sizeof(log));
 						char releasenote_file[100];
@@ -431,8 +448,10 @@ int merlinr_firmware_check_update_main(int argc, char *argv[])
 	curl_global_cleanup();
 
 GODONE:
-#if defined(SBRAC3200P) || defined(RTACRH17) || defined(RTAC3200) || defined(RTAC85P)
+#if defined(RTACRH17) || defined(RTAC3200) || defined(RTAC85P)
 	snprintf(info,sizeof(info),"3004_382_%s",nvram_get("extendno"));
+#elif defined(RTAC68U) || defined(RTAC3100) || defined(RTAC88U)
+	snprintf(info,sizeof(info),"3004_385_%s",nvram_get("extendno"));
 #else
 	snprintf(info,sizeof(info),"3004_384_%s",nvram_get("extendno"));
 #endif
@@ -451,7 +470,7 @@ GODONE:
 	FWUPDATE_DBG("---- firmware check update finish ----");
 	return 0;
 }
-
+#if !defined(BLUECAVE)
 void exec_uu_merlinr()
 {
 	FILE *fpmodel, *fpmac, *fpuu, *fpurl, *fpmd5, *fpcfg;
@@ -460,6 +479,7 @@ void exec_uu_merlinr()
 	char *dup_pattern, *g, *gg;
 	char p[10][100];
 	if(nvram_get_int("sw_mode") == 1){
+		add_rc_support("uu_accel");
 		if ((fpmodel = fopen("/var/model", "w"))){
 			fprintf(fpmodel, nvram_get("productid"));
 			fclose(fpmodel);
@@ -538,11 +558,6 @@ void exec_uu_merlinr()
 		}
 	}
 }
-#if !defined(RTAC68U) && !defined(GTAC5300) && !defined(GTAC2900) && !defined(RTAC86U)&& !defined(TUFAX3000)
-void start_sendfeedback(void)
-{
-
-}
 #endif
 #if defined(RTCONFIG_SOFTCENTER)
 void softcenter_eval(int sig)
@@ -559,8 +574,15 @@ void softcenter_eval(int sig)
 	} else if (SOFTCENTER_MOUNT == sig){
 		snprintf(path, sizeof(path), "%s/softcenter-mount.sh", sc);
 		snprintf(action, sizeof(action), "start");
+	} else if (SOFTCENTER_SERVICES == sig){
+		snprintf(path, sizeof(path), "%s/softcenter-services.sh", sc);
+		snprintf(action, sizeof(action), "start");
+	//enable it after 1.3.0
+	//} else if (SOFTCENTER_UNMOUNT == sig){
+	//	snprintf(path, sizeof(path), "%s/softcenter-unmount.sh", sc);
+	//	snprintf(action, sizeof(action), "unmount");
 	} else {
-		logmessage("Softcenter", "sig=%s, bug?",sig);
+		logmessage("Softcenter", "sig=%d, bug?",sig);
 		return;
 	}
 	char *eval_argv[] = { path, action, NULL };

@@ -379,8 +379,8 @@ function btnNext() {
                 alert("<#JS_fieldblank#>");
                 document.form.country.focus();
                 return false;
-        }
-        else if ( document.form.country.value=='NO'|| document.form.ISP.value=='NO' ){
+	}
+	else if ( document.form.country.value=='NO'|| document.form.ISP.value=='NO' ){
 		var tmp_vlanid = document.form.dslx_vid.value;
 		if ( isNaN(tmp_vlanid) == true ) {
 			alert('<#WANVLANIDText#> "' + tmp_vlanid + '" <#Manual_Setting_JS_invalid#>');
@@ -394,7 +394,7 @@ function btnNext() {
 		document.form.dsltmp_cfg_vid.value = document.form.dslx_vid.value;
 		document.form.dsltmp_cfg_iptv_idx.value = "";
 		document.form.dsltmp_cfg_ispname.value = "";
-		document.form.dsltmp_cfg_country.value = "";
+		document.form.dsltmp_cfg_country.value = (document.form.country.value=='Turkey')? document.form.country.value:"";
 	}
 	else {
 		var isp_idx = 0
@@ -458,9 +458,16 @@ function btnNext() {
 		document.form.dsltmp_cfg_dot1q.value = 1;
 		document.form.dsltmp_cfg_vid.value = 0;
 	}
+
+	if(document.form.dsltmp_cfg_country.value=='Turkey'){
+		if(document.form.dslx_vdsl_bitswap.value != "0"){
+			parent.restartDSLSetting = true;
+		}
+		document.form.dslx_vdsl_bitswap.value = "0";
+	}
+
 	if( document.form.dsltmp_cfg_country.value=='Turkey'
-		&& document.form.dsltmp_cfg_ispname.value.search("Turk Telekom") >= 0
-	){
+		&& document.form.dsltmp_cfg_ispname.value.search("Turk Telekom") >= 0 ){
 		document.form.dslx_testlab.value = "TR_TT";
 		document.form.dslx_dla_enable.value = "0";
 	}
@@ -585,6 +592,8 @@ function showSpecificSetting(idx) {
 <input type="hidden" name="dslx_vd1q0" value="1">
 <input type="hidden" name="dslx_testlab" value="<% nvram_get("dslx_testlab"); %>">
 <input type="hidden" name="dslx_dla_enable" value="<% nvram_get("dslx_dla_enable"); %>">
+<input type="hidden" name="dslx_vdsl_bitswap" value="<% nvram_get("dslx_vdsl_bitswap"); %>">
+
 <div class="QISmain">
 	<div class="formfonttitle" style="padding:6 0 0 10;">
 			<div>
