@@ -8539,6 +8539,11 @@ static int get_client_detail_info(struct json_object *clients, struct json_objec
 					json_object_object_add(client, "isOnline", json_object_new_string("0"));
 			}
 			else
+#if defined(MERLINR_VER_MAJOR_B)
+				if(p_client_info_tab->device_flag[i]&(1<<FLAG_EXIST))
+					json_object_object_add(client, "isOnline", json_object_new_string("1"));
+				else
+#endif
 				json_object_object_add(client, "isOnline", json_object_new_string("0"));
 #endif
 			json_object_object_add(client, "ssid", json_object_new_string(p_client_info_tab->ssid[i]));
@@ -12184,7 +12189,7 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 	int count, cnt;
 	long filelen;
 	int offset;
-#if defined(K3) || defined(K3C) || defined(SBRAC1900P) || defined(SBRAC3200P) || defined(R8000P) || defined(R7900P) || defined(RAX20)
+#if defined(K3) || defined(K3C) || defined(SBRAC1900P) || defined(SBRAC3200P) || defined(R8000P) || defined(R7900P) || defined(RAX20) || defined(XWR3100) || defined(R7000P)
 	int checkname=0;
 #endif
 #ifndef RTCONFIG_SMALL_FW_UPDATE
@@ -12225,6 +12230,9 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 #if defined(K3)
 		if (strstr(buf, "K3"))
 			checkname=1;
+#elif defined(XWR3100)
+		if (strstr(buf, "XWR3100"))
+			checkname=1;
 #elif defined(K3C)
 		if (strstr(buf, "K3C"))
 			checkname=1;
@@ -12237,6 +12245,9 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 #elif defined(R8000P) || defined(R7900P)
 		if (strstr(buf, "R7900P")||strstr(buf, "R8000P"))
 			checkname=1;
+#elif defined(R7000P)
+		if (strstr(buf, "R7000P"))
+			checkname=1;
 #elif  defined(RAX20)
 		if (strstr(buf, "RAX20"))
 			checkname=1;
@@ -12244,7 +12255,7 @@ do_upgrade_post(char *url, FILE *stream, int len, char *boundary)
 		if (!strncasecmp(buf, "Content-Disposition:", 20) && strstr(buf, "name=\"file\""))
 			break;
 	}
-#if defined(K3) || defined(K3C) || defined(SBRAC1900P) || defined(SBRAC3200P) || defined(R8000P) || defined(R7900P) || defined(RAX20)
+#if defined(K3) || defined(K3C) || defined(SBRAC1900P) || defined(SBRAC3200P) || defined(R8000P) || defined(R7900P) || defined(RAX20) || defined(XWR3100) || defined(R7000P)
 	if(checkname==0)
 		goto err;
 #endif
@@ -16216,7 +16227,7 @@ applydb_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 	char *result = NULL;
 	char *temp = NULL;
 	char *name = websGetVar(wp, "p","");
-	char *userm = strstr(url, "use_rm=1");
+	char *userm = websGetVar(wp, "use_rm", "");
 	char scPath[128];
 	char *post_db_buf = post_json_buf;
 
@@ -16254,8 +16265,8 @@ applydb_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 				strcpy(dbval, temp+1);
 				strncpy(dbvar, dbjson[j], strlen(dbjson[j])-strlen(temp));
 			//logmessage("HTTPD", "name: %s post: %s", dbvar, dbval);
-			if(userm)
-				doSystem("dbus remove %s", dbvar);
+			if(*userm || dbval[0]=='\0')
+				dbclient_rm(&client, dbvar, strlen(dbvar));
 			else
 				dbclient_bulk(&client, "set", dbvar, strlen(dbvar), dbval, strlen(dbval));
 		}
@@ -16286,8 +16297,8 @@ applydb_cgi(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 				strcpy(dbval, temp+1);
 				strncpy(dbvar, dbjson[j], strlen(dbjson[j])-strlen(temp));
 			//logmessage("HTTPD", "name: %s post: %s", dbvar, dbval);
-			if(userm)
-				doSystem("dbus remove %s", dbvar);
+			if(*userm || dbval[0]=='\0')
+				dbclient_rm(&client, dbvar, strlen(dbvar));
 			else
 				dbclient_bulk(&client, "set", dbvar, strlen(dbvar), dbval, strlen(dbval));
 		}
@@ -16428,7 +16439,7 @@ do_logread(webs_t wp, char_t *urlPrefix, char_t *webDir, int arg,
 	//sscanf(url, "logreaddb.cgi?%s", filename);
 	char *filename = websGetVar(wp, "p","");
 	char *script = websGetVar(wp, "script", "");
-	if(script){
+	if(*script){
 		sprintf(scPath, "/jffs/softcenter/scripts/%s", script);
 		strlcpy(SystemCmd, scPath, sizeof(SystemCmd));
 		sys_script("syscmd.sh");
@@ -25186,8 +25197,7 @@ ej_get_wan_lan_status(int eid, webs_t wp, int argc, char **argv)
 	struct json_object *wanLanStatus = NULL;
 	struct json_object *wanLanLinkSpeed = NULL;
 	struct json_object *wanLanCount = NULL;
-
-#if defined(K3) || defined(R8000P) || defined(R7900P)
+#if defined(K3) || defined(R8000P) || defined(R7900P) || defined(EA6700) || defined(R7000P)
 	fp = popen("rc Get_PhyStatus", "r");
 #else
 	fp = popen("ATE Get_WanLanStatus", "r");

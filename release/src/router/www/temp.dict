@@ -6,5 +6,3 @@ PPTP_desc2=Для користування сервером VPN, будь лас
 vpn_max_clients=Сервер VPN дозволяє максимум 30 клієнтів!
 vpn_maximum_clients=Максимум 30 клієнтів
 WLANConfig11b_display2_sectiondesc=The function does not support [ WPA2-Enterprise, WPA-Auto-Enterprise ] security authentication method.
-VPN_Fusion=Ф‘южн VPN
-VPN_Fusion_FAQ=<a id="faq1" href="" target="_blank" style="font-weight:bolder;text-decoration:underline;">Ф‘южн VPN - Розповсюджені питання</a>
