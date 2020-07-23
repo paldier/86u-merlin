@@ -81,10 +81,10 @@ COMMANDS
             crond, cut, date, dd, depmod, df, dirname, dmesg, du, echo, egrep,
             env, ether-wake, expr, false, fatattr, fdisk, fgrep, find,
             flash_eraseall, flock, free, fsck, fsck.minix, fstrim, fsync,
-            ftpget, grep, gunzip, gzip, halt, head, ifconfig, insmod, ionice,
-            kill, killall, klogd, less, ln, logger, login, logread, ls, lsmod,
-            lsusb, md5sum, mdev, mkdir, mknod, mkswap, modprobe, more, mount,
-            mv, nc, netstat, nice, nohup, nslookup, pidof, ping, ping6,
+            ftpget, getopt, grep, gunzip, gzip, halt, head, ifconfig, insmod,
+            ionice, kill, killall, klogd, less, ln, logger, login, logread, ls,
+            lsmod, lsusb, md5sum, mdev, mkdir, mknod, mkswap, modprobe, more,
+            mount, mv, nc, netstat, nice, nohup, nslookup, pidof, ping, ping6,
             poweroff, printf, ps, pwd, pwdx, readlink, reboot, remove-shell,
             renice, rm, rmdir, rmmod, route, sed, setconsole, sh, shuf, sleep,
             smemcap, sort, split, start-stop-daemon, strings, stty, swapoff,
@@ -553,6 +553,27 @@ COMMAND DESCRIPTIONS
                 -u USER Username
                 -p PASS Password
                 -P NUM  Port
+
+    getopt
+        getopt [OPTIONS] [--] OPTSTRING PARAMS
+
+                -a,--alternative                Allow long options starting with single -
+                -l,--longoptions=LOPT[,...]     Long options to recognize
+                -n,--name=PROGNAME              The name under which errors are reported
+                -o,--options=OPTSTRING          Short options to recognize
+                -q,--quiet                      No error messages on unrecognized options
+                -Q,--quiet-output               No normal output
+                -s,--shell=SHELL                Set shell quoting conventions
+                -T,--test                       Version test (exits with 4)
+                -u,--unquoted                   Don't quote output
+
+        Example:
+
+        O=`getopt -l bb: -- ab:c:: "$@"` || exit 1 eval set -- "$O" while
+        true; do case "$1" in -a) echo A; shift;; -b|--bb) echo "B:'$2'";
+        shift 2;; -c) case "$2" in "") echo C; shift 2;; *) echo "C:'$2'";
+        shift 2;; esac;; --) shift; break;; *) echo Error; exit 1;; esac
+        done
 
     grep
         grep [-HhnlLoqvsriwFE] [-m N] [-A/B/C N] PATTERN/-e PATTERN.../-f

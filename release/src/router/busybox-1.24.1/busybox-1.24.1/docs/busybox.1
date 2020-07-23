@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "BUSYBOX 1"
-.TH BUSYBOX 1 "2020-07-18" "version 1.24.1" "busybox"
+.TH BUSYBOX 1 "2020-07-20" "version 1.24.1" "busybox"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -221,10 +221,10 @@ Currently available applets include:
 \&        crond, cut, date, dd, depmod, df, dirname, dmesg, du, echo, egrep,
 \&        env, ether\-wake, expr, false, fatattr, fdisk, fgrep, find,
 \&        flash_eraseall, flock, free, fsck, fsck.minix, fstrim, fsync,
-\&        ftpget, grep, gunzip, gzip, halt, head, ifconfig, insmod, ionice,
-\&        kill, killall, klogd, less, ln, logger, login, logread, ls, lsmod,
-\&        lsusb, md5sum, mdev, mkdir, mknod, mkswap, modprobe, more, mount,
-\&        mv, nc, netstat, nice, nohup, nslookup, pidof, ping, ping6,
+\&        ftpget, getopt, grep, gunzip, gzip, halt, head, ifconfig, insmod,
+\&        ionice, kill, killall, klogd, less, ln, logger, login, logread, ls,
+\&        lsmod, lsusb, md5sum, mdev, mkdir, mknod, mkswap, modprobe, more,
+\&        mount, mv, nc, netstat, nice, nohup, nslookup, pidof, ping, ping6,
 \&        poweroff, printf, ps, pwd, pwdx, readlink, reboot, remove\-shell,
 \&        renice, rm, rmdir, rmmod, route, sed, setconsole, sh, shuf, sleep,
 \&        smemcap, sort, split, start\-stop\-daemon, strings, stty, swapoff,
@@ -774,6 +774,38 @@ Download a file via \s-1FTP\s0
 \&        \-p PASS Password
 \&        \-P NUM  Port
 .Ve
+.IP "\fBgetopt\fR" 4
+.IX Item "getopt"
+getopt [\s-1OPTIONS\s0] [\-\-] \s-1OPTSTRING PARAMS\s0
+.Sp
+.Vb 9
+\&        \-a,\-\-alternative                Allow long options starting with single \-
+\&        \-l,\-\-longoptions=LOPT[,...]     Long options to recognize
+\&        \-n,\-\-name=PROGNAME              The name under which errors are reported
+\&        \-o,\-\-options=OPTSTRING          Short options to recognize
+\&        \-q,\-\-quiet                      No error messages on unrecognized options
+\&        \-Q,\-\-quiet\-output               No normal output
+\&        \-s,\-\-shell=SHELL                Set shell quoting conventions
+\&        \-T,\-\-test                       Version test (exits with 4)
+\&        \-u,\-\-unquoted                   Don\*(Aqt quote output
+.Ve
+.Sp
+Example:
+.Sp
+O=`getopt \-l bb: \*(-- ab:c:: \*(L"$@\*(R"` || exit 1
+eval set \*(-- \*(L"$O\*(R"
+while true; do
+	case \*(L"$1\*(R" in
+	\-a)	echo A; shift;;
+	\-b|\-\-bb) echo \*(L"B:'$2'\*(R"; shift 2;;
+	\-c)	case \*(L"$2\*(R" in
+		"\*(L")	echo C; shift 2;;
+		*)	echo \*(R"C:'$2'"; shift 2;;
+		esac;;
+	\-\-)	shift; break;;
+	*)	echo Error; exit 1;;
+	esac
+done
 .IP "\fBgrep\fR" 4
 .IX Item "grep"
 grep [\-HhnlLoqvsriwFE] [\-m N] [\-A/B/C N] PATTERN/\-e \s-1PATTERN..\s0./\-f \s-1FILE\s0 [\s-1FILE\s0]...
