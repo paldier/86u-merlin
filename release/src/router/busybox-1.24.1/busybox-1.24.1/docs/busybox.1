@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "BUSYBOX 1"
-.TH BUSYBOX 1 "2020-07-20" "version 1.24.1" "busybox"
+.TH BUSYBOX 1 "2020-09-09" "version 1.24.1" "busybox"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -228,7 +228,7 @@ Currently available applets include:
 \&        poweroff, printf, ps, pwd, pwdx, readlink, reboot, remove\-shell,
 \&        renice, rm, rmdir, rmmod, route, sed, setconsole, sh, shuf, sleep,
 \&        smemcap, sort, split, start\-stop\-daemon, strings, stty, swapoff,
-\&        swapon, sync, syslogd, tail, tar, taskset, telnetd, test, tftp,
+\&        swapon, sync, syslogd, tail, tar, taskset, tee, telnetd, test, tftp,
 \&        tftpd, top, touch, tr, traceroute, traceroute6, true, tty, udhcpc,
 \&        umount, uname, uniq, unzip, uptime, usleep, vconfig, vi, watch, wc,
 \&        which, xargs, zcat, zcip
@@ -1608,6 +1608,16 @@ Set or get \s-1CPU\s0 affinity
 .Sp
 .Vb 1
 \&        \-p      Operate on an existing PID
+.Ve
+.IP "\fBtee\fR" 4
+.IX Item "tee"
+tee [\-ai] [\s-1FILE\s0]...
+.Sp
+Copy stdin to each \s-1FILE,\s0 and also to stdout
+.Sp
+.Vb 2
+\&        \-a      Append to the given FILEs, don\*(Aqt overwrite
+\&        \-i      Ignore interrupt signals (SIGINT)
 .Ve
 .IP "\fBtelnetd\fR" 4
 .IX Item "telnetd"

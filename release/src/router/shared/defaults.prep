@@ -16829,6 +16829,7 @@ struct nvram_tuple router_defaults[] = {
  { "uu_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "led_disable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "message_loglevel", "5", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+ { "nat_type", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
  { 0, 0, 0, 0, 0, 0, 0 }
 };
@@ -16906,7 +16907,7 @@ struct nvram_tuple router_state_defaults[] = {
 
  { "dms_state", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "dms_dbcwd", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3533 "defaults.c"
+# 3534 "defaults.c"
  { "apps_dev", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "apps_mounted_path", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "apps_state_action", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16953,7 +16954,7 @@ struct nvram_tuple router_state_defaults[] = {
  { "vpn_client4_errno", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "vpn_client5_state", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "vpn_client5_errno", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3700 "defaults.c"
+# 3701 "defaults.c"
  { "le_state", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_state_t", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_sbstate_t", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16976,11 +16977,11 @@ struct nvram_tuple router_state_defaults[] = {
 
  { 0, 0, 0, 0, 0, 0, 0 }
 };
-# 4060 "defaults.c"
+# 4061 "defaults.c"
 struct nvram_tuple bcm4360ac_defaults[] = {
  { 0, 0, 0, 0, 0, 0, 0 }
 };
-# 4184 "defaults.c"
+# 4185 "defaults.c"
 struct nvram_tuple router_defaults_override_type1[] = {
  { "router_disable", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "lan_stp", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -17062,9 +17063,9 @@ static void
 fix_name(const char *name, char *fixed_name)
 {
  char *pSuffix = 
-# 4264 "defaults.c" 3 4
+# 4265 "defaults.c" 3 4
                 ((void *)0)
-# 4264 "defaults.c"
+# 4265 "defaults.c"
                     ;
 
 
@@ -17074,17 +17075,17 @@ fix_name(const char *name, char *fixed_name)
  pSuffix = strchr(name, '_');
 
  if ((strncmp(name, "wl", 2) == 0) && 
-# 4272 "defaults.c" 3 4
+# 4273 "defaults.c" 3 4
                                      ((*__ctype_b_loc ())[(int) ((
-# 4272 "defaults.c"
+# 4273 "defaults.c"
                                      name[2]
-# 4272 "defaults.c" 3 4
+# 4273 "defaults.c" 3 4
                                      ))] & (unsigned short int) _ISdigit) 
-# 4272 "defaults.c"
+# 4273 "defaults.c"
                                                       && (pSuffix != 
-# 4272 "defaults.c" 3 4
+# 4273 "defaults.c" 3 4
                                                                      ((void *)0)
-# 4272 "defaults.c"
+# 4273 "defaults.c"
                                                                          )) {
   strcpy(fixed_name, "wl");
   strcpy(&fixed_name[2], pSuffix);
@@ -17096,7 +17097,7 @@ fix_name(const char *name, char *fixed_name)
 }
 
 extern char *tcode_default_get(const char *name);
-# 4292 "defaults.c"
+# 4293 "defaults.c"
 char *
 nvram_default_get(const char *name)
 {
@@ -17122,7 +17123,7 @@ nvram_default_get(const char *name)
    return lan_ipaddr;
   }
  }
-# 4341 "defaults.c"
+# 4342 "defaults.c"
  {
   char *value = tcode_default_get(fixed_name);
   if (value) {
@@ -17133,18 +17134,18 @@ nvram_default_get(const char *name)
 
 
  if ((strncmp(name, "wl", 2) == 0) && 
-# 4350 "defaults.c" 3 4
+# 4351 "defaults.c" 3 4
                                      ((*__ctype_b_loc ())[(int) ((
-# 4350 "defaults.c"
+# 4351 "defaults.c"
                                      name[2]
-# 4350 "defaults.c" 3 4
+# 4351 "defaults.c" 3 4
                                      ))] & (unsigned short int) _ISdigit) 
-# 4350 "defaults.c"
+# 4351 "defaults.c"
                                                       && (name[3] == '_'))
  for (idx = 0; router_defaults[idx].name != 
-# 4351 "defaults.c" 3 4
+# 4352 "defaults.c" 3 4
                                            ((void *)0)
-# 4351 "defaults.c"
+# 4352 "defaults.c"
                                                ; idx++) {
   if (strcmp(router_defaults[idx].name, name) == 0) {
    return router_defaults[idx].value;
@@ -17152,9 +17153,9 @@ nvram_default_get(const char *name)
  }
 
  for (idx = 0; router_defaults[idx].name != 
-# 4357 "defaults.c" 3 4
+# 4358 "defaults.c" 3 4
                                            ((void *)0)
-# 4357 "defaults.c"
+# 4358 "defaults.c"
                                                ; idx++) {
   if (strcmp(router_defaults[idx].name, fixed_name) == 0) {
    return router_defaults[idx].value;
@@ -17162,9 +17163,9 @@ nvram_default_get(const char *name)
  }
 
  return 
-# 4363 "defaults.c" 3 4
+# 4364 "defaults.c" 3 4
        ((void *)0)
-# 4363 "defaults.c"
+# 4364 "defaults.c"
            ;
 }
 
@@ -17188,7 +17189,7 @@ nvram_validate_all(char *prefix, bool restore)
    nvram_set(tmp, v ? v : t->value);
   }
  }
-# 4401 "defaults.c"
+# 4402 "defaults.c"
 }
 
 
@@ -17204,5 +17205,5 @@ nvram_restore_var(char *prefix, char *name)
    break;
   }
  }
-# 4428 "defaults.c"
+# 4429 "defaults.c"
 }

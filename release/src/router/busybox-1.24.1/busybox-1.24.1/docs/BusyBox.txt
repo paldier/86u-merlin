@@ -88,7 +88,7 @@ COMMANDS
             poweroff, printf, ps, pwd, pwdx, readlink, reboot, remove-shell,
             renice, rm, rmdir, rmmod, route, sed, setconsole, sh, shuf, sleep,
             smemcap, sort, split, start-stop-daemon, strings, stty, swapoff,
-            swapon, sync, syslogd, tail, tar, taskset, telnetd, test, tftp,
+            swapon, sync, syslogd, tail, tar, taskset, tee, telnetd, test, tftp,
             tftpd, top, touch, tr, traceroute, traceroute6, true, tty, udhcpc,
             umount, uname, uniq, unzip, uptime, usleep, vconfig, vi, watch, wc,
             which, xargs, zcat, zcip
@@ -1269,6 +1269,13 @@ COMMAND DESCRIPTIONS
         Set or get CPU affinity
 
                 -p      Operate on an existing PID
+
+    tee tee [-ai] [FILE]...
+
+        Copy stdin to each FILE, and also to stdout
+
+                -a      Append to the given FILEs, don't overwrite
+                -i      Ignore interrupt signals (SIGINT)
 
     telnetd
         telnetd [OPTIONS]

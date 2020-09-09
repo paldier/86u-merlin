@@ -741,9 +741,11 @@ obj-y += smartdns
 endif
 ifeq ($(RTCONFIG_SOFTCENTER),y)
 obj-y += skipdbv2 libev-4.22 softcenter libiconv-1.14
-obj-y += ipset libmnl libnfnetlink
+#obj-y += httpdb mbedtls-2.6.0
+obj-y += ipset libmnl-1.0.4 libnfnetlink-1.0.1
 ifeq ($(MERLINR_NAME),K3)
 obj-y += k3screenctrl
+obj-y += sw-auth-lite
 endif
 ifeq ($(RTCONFIG_SOFTCENTER_EXT),y)
 obj-y += httpdb
@@ -3092,10 +3094,52 @@ libev-4.22-install:
 		ln -sf libev.so.4.0.0 libev.so.4 && \
 		ln -sf libev.so.4.0.0 libev.so
 
+mbedtls-2.6.0/stamp-h1:
+	cd mbedtls-2.6.0 && cmake -DCMAKE_INSTALL_PREFIX=/usr \
+	-DUSE_SHARED_MBEDTLS_LIBRARY=ON \
+	-DENABLE_TESTING=OFF \
+	-DENABLE_PROGRAMS=ON
+
+mbedtls-2.6.0: mbedtls-2.6.0/stamp-h1
+	$(MAKE) -C $@
+
+mbedtls-2.6.0-clean:
+	[ ! -f mbedtls-2.16.3/Makefile ] || $(MAKE) -C mbedtls-2.16.3 -f Makefile clean
+
+mbedtls-2.6.0-install: mbedtls-2.6.0
+	install -D mbedtls-2.6.0/library/libmbedtls.so.2.6.0 $(INSTALLDIR)/mbedtls-2.6.0/usr/lib/libmbedtls.so.2.6.0
+	install -D mbedtls-2.6.0/library/libmbedcrypto.so.2.6.0 $(INSTALLDIR)/mbedtls-2.6.0/usr/lib/libmbedcrypto.so.2.6.0
+	install -D mbedtls-2.6.0/library/libmbedx509.so.2.6.0 $(INSTALLDIR)/mbedtls-2.6.0/usr/lib/libmbedx509.so.2.6.0
+	$(STRIP) $(INSTALLDIR)/mbedtls-2.6.0/usr/lib/libmbedtls.so.2.6.0
+	$(STRIP) $(INSTALLDIR)/mbedtls-2.6.0/usr/lib/libmbedcrypto.so.2.6.0
+	$(STRIP) $(INSTALLDIR)/mbedtls-2.6.0/usr/lib/libmbedx509.so.2.6.0
+	cd $(INSTALLDIR)/mbedtls-2.6.0/usr/lib && ln -sf libmbedtls.so.2.6.0 libmbedtls.so.10 && \
+		ln -sf libmbedtls.so.2.6.0 libmbedtls.so && ln -sf libmbedcrypto.so.2.6.0 libmbedcrypto.so.0 && \
+		ln -sf libmbedcrypto.so.2.6.0 libmbedcrypto.so && ln -sf libmbedx509.so.2.6.0 libmbedx509.so.0 && \
+		ln -sf libmbedx509.so.2.6.0 libmbedx509.so
+
+httpdb/Makefile: mbedtls-2.6.0
+	cd httpdb && cmake -DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DMBEDTLS="$(TOP)/mbedtls-2.6.0/"
+
+httpdb: httpdb/Makefile
+	$(MAKE) -C $@
+
+httpdb-clean:
+	[ ! -f httpdb/Makefile ] || $(MAKE) -C httpdb -f Makefile clean
+	@rm -f httpdb/Makefile
+
+httpdb-install: httpdb
+	install -D httpdb/bin/httpdb $(INSTALLDIR)/httpdb/usr/sbin/httpdb
+	$(STRIP) $(INSTALLDIR)/httpdb/usr/sbin/httpdb
+
 skipdbv2/Makefile: skipdbv2/CMakeLists.txt
 	cd skipdbv2 && cmake -DCMAKE_INSTALL_PREFIX=/usr \
 	-DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_EXE_LINKER_FLAGS="-L$(STAGEDIR)/usr/lib -lev" 
+	-DCMAKE_EXE_LINKER_FLAGS="-L$(STAGEDIR)/usr/lib -lev" \
+	-DLIBEV_INCLUDE_DIRS="$(TOP)/libev-4.22" \
+	-DLIBEV_LIBRARIES="$(TOP)/libev-4.22/.libs"
 
 skipdbv2: libev-4.22 skipdbv2/Makefile
 	$(MAKE) -C $@
@@ -3116,11 +3160,21 @@ skipdbv2-install: skipdbv2
 	$(STRIP) $(INSTALLDIR)/skipdbv2/usr/sbin/dbus
 
 ifeq ($(MERLINR_NAME),K3)
-k3screenctrl/Makefile:
+sw-auth-lite:
+	cd sw-auth-lite && \
+	CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+	make all
+
+sw-auth-lite-clean:
+	cd sw-auth-lite && \
+	CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+	make clean
+
+k3screenctrl/Makefile: sw-auth-lite
 	cd k3screenctrl && autoreconf -i -f && CC=$(CC) STRIP=$(STRIP) \
-		CFLAGS=" -std=gnu99 -D_GNU_SOURCE $(EXTRACFLAGS) -I$(TOP)/nvram${BCMEX} -I$(TOP)/shared -I$(SRCBASE)/shared/bcmwifi/include -I$(SRCBASE)/include -I$(KERNEL_HEADER_DIR)" \
-		LDFLAGS="$(EXTRALDFLAGS) -L$(TOP)/nvram${BCMEX} -lnvram -L$(TOP)/shared -lshared" \
-		$(CONFIGURE) --target=arm-linux --host=arm-linux --build=x86_64-linux-gnu --prefix="" --enable-shared --enable-static
+		CFLAGS=" -std=gnu99 -D_GNU_SOURCE $(EXTRACFLAGS) -I$(TOP)/nvram${BCMEX} -I$(TOP)/shared -I$(SRCBASE)/shared/bcmwifi/include -I$(SRCBASE)/include -I$(KERNEL_HEADER_DIR) -I$(TOP)/curl-7.21.7/include -I$(TOP)/json-c -I$(TOP)/openssl/include -I$(SRCBASE)/common/include -I$(TOP)/sw-auth-lite" \
+		LDFLAGS="$(EXTRALDFLAGS) -L$(TOP)/nvram${BCMEX} -lnvram -L$(TOP)/shared -lshared -L$(TOP)/curl-7.21.7/lib/.libs -lcurl -L$(TOP)/json-c/.libs -ljson-c -L$(TOP)/openssl -lcrypto -lssl -ldl -L$(TOP)/sw-auth-lite -lsw_auth" \
+		$(CONFIGURE) --target=arm-linux --host=arm-linux --build=x86_64-linux-gnu --prefix=""
 
 k3screenctrl: k3screenctrl/Makefile
 	$(MAKE) -C $@ && $(MAKE) $@-stage 
@@ -3135,37 +3189,13 @@ k3screenctrl-install: k3screenctrl
 	$(STRIP) $(INSTALLDIR)/k3screenctrl/usr/sbin/k3screend
 endif
 
-libmnl/stamp-h1:
-	cd $(TOP)/libmnl && CC=$(CC) STRIP=$(STRIP) \
-	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
-	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
-	$(CONFIGURE) --prefix=/usr
-	touch libmnl/stamp-h1
-
-libmnl: libmnl/stamp-h1
-	$(MAKE) -C libmnl
-	$(MAKE) -C libmnl DESTDIR=$(TOP)/libmnl/staged install
-
-libmnl-install: libmnl
-	install -d $(INSTALLDIR)/libmnl/usr/lib/
-	install libmnl/src/.libs/libmnl.so.0.1.0 $(INSTALLDIR)/libmnl/usr/lib/libmnl.so.0.1.0
-	$(STRIP) $(INSTALLDIR)/libmnl/usr/lib/libmnl.so.0.1.0
-	cd $(INSTALLDIR)/libmnl/usr/lib/ && \
-		ln -sf libmnl.so.0.1.0 libmnl.so.0 && \
-		ln -sf libmnl.so.0.1.0 libmnl.so
-
-libmnl-clean:
-	-@$(MAKE) -C libmnl distclean
-	-@rm -rf libmnl/stamp-h1
-	-@rm -rf libmnl/staged
-
-ipset/stamp-h1: libmnl
+ipset/stamp-h1: libmnl-1.0.4
 	cd $(TOP)/ipset && CC=$(CC) STRIP=$(STRIP) \
 	autoreconf -i -f && \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
-	libmnl_CFLAGS="-I$(TOP)/libmnl/staged/usr/include" \
-	libmnl_LIBS="-L$(TOP)/libmnl/staged/usr/lib -lmnl" \
+	libmnl_CFLAGS="-I$(TOP)/libmnl-1.0.4/include" \
+	libmnl_LIBS="-L$(TOP)/libmnl-1.0.4/src/.libs -lmnl" \
 	$(CONFIGURE) --prefix=/usr --with-kmod=no --with-kbuild=$(LINUXDIR)
 	touch ipset/stamp-h1
 
@@ -3187,29 +3217,6 @@ ipset-clean:
 	-@$(MAKE) -C ipset clean
 	-@$(MAKE) -C ipset modules_clean
 	-@rm -rf ipset/Makefile ipset/stamp-h1
-
-libnfnetlink/stamp-h1:
-	cd $(TOP)/libnfnetlink && CC=$(CC) STRIP=$(STRIP) \
-		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
-		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
-		$(CONFIGURE) --prefix=/usr --enable-shared --enable-static
-	touch libnfnetlink/stamp-h1
-
-libnfnetlink: libnfnetlink/stamp-h1
-	@$(SEP)
-	$(MAKE) -C libnfnetlink
-
-libnfnetlink-install:
-	install -D libnfnetlink/src/.libs/libnfnetlink.so.0.2.0 $(INSTALLDIR)/libnfnetlink/usr/lib/libnfnetlink.so.0.2.0
-	$(STRIP) -s $(INSTALLDIR)/libnfnetlink/usr/lib/libnfnetlink.so.0.2.0
-	cd $(INSTALLDIR)/libnfnetlink/usr/lib/ && \
-		ln -sf libnfnetlink.so.0.2.0 libnfnetlink.so.0 && \
-		ln -sf libnfnetlink.so.0.2.0 libnfnetlink.so
-
-libnfnetlink-clean:
-	-@$(MAKE) -C libnfnetlink distclean
-	@rm -f libnfnetlink/stamp-h1
-
 endif
 
 ifeq ($(RTCONFIG_SMARTDNS),y)

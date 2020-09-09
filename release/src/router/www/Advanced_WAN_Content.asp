@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <html xmlns:v>
 <head>
@@ -1082,7 +1082,13 @@ function show_dnspriv_rulelist(){
 									<input type="radio" name="wan_nat_x" class="input" value="0" <% nvram_match("wan_nat_x", "0", "checked"); %>><#checkbox_No#>
 								</td>
 							</tr>				
-
+							<tr id="nat_type_tr">
+								<th>NAT Type</th>
+								<td>
+									<input type="radio" name="nat_type" class="input" value="0" <% nvram_match("nat_type", "0", "checked"); %>>Symmetric
+									<input type="radio" name="nat_type" class="input" value="1" <% nvram_match("nat_type", "1", "checked"); %>>Fullcone
+								</td>
+							</tr>
 							<tr>
 								<th><a class="hintstyle" href="javascript:void(0);" onClick="openHint(7,23);"><#BasicConfig_EnableMediaServer_itemname#></a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<a id="faq" href="" target="_blank" style="font-family:Lucida Console;text-decoration:underline;">UPnP&nbspFAQ</a></th>
 								<td>
@@ -1417,3 +1423,4 @@ function show_dnspriv_rulelist(){
 
 </body>
 </html>
+

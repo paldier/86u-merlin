@@ -72,7 +72,7 @@
         poweroff, printf, ps, pwd, pwdx, readlink, reboot, remove-shell,
         renice, rm, rmdir, rmmod, route, sed, setconsole, sh, shuf, sleep,
         smemcap, sort, split, start-stop-daemon, strings, stty, swapoff,
-        swapon, sync, syslogd, tail, tar, taskset, telnetd, test, tftp,
+        swapon, sync, syslogd, tail, tar, taskset, tee, telnetd, test, tftp,
         tftpd, top, touch, tr, traceroute, traceroute6, true, tty, udhcpc,
         umount, uname, uniq, unzip, uptime, usleep, vconfig, vi, watch, wc,
         which, xargs, zcat, zcip</code></pre>
@@ -1567,6 +1567,17 @@ Other:
 <p>Set or get CPU affinity</p>
 
 <pre><code>        -p      Operate on an existing PID</code></pre>
+
+</dd>
+<dt id="tee"><b>tee</b></dt>
+<dd>
+
+<p>tee [-ai] [FILE]...</p>
+
+<p>Copy stdin to each FILE, and also to stdout</p>
+
+<pre><code>        -a      Append to the given FILEs, don&#39;t overwrite
+        -i      Ignore interrupt signals (SIGINT)</code></pre>
 
 </dd>
 <dt id="telnetd"><b>telnetd</b></dt>
