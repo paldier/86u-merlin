@@ -119,9 +119,9 @@ diff -ur mtd-utils-20090606_orig/ubi-utils/old-utils/src/libubi.c mtd-utils-2009
  #include <dirent.h>
  #include <errno.h>
  #include <unistd.h>
-diff -ur mtd-utils-20090606_orig/ubi-utils/mkfs.ubifs/mkfs.ubifs.h mtd-utils-20090606/ubi-utils/mkfs.ubifs/mkfs.ubifs.h
---- ./mtd-utils-20090606_orig/ubi-utils/mkfs.ubifs/mkfs.ubifs.h
-+++ ./mtd-utils-20090606/ubi-utils/mkfs.ubifs/mkfs.ubifs.h
+diff -ur mtd-utils-20090606_orig/mkfs.ubifs/mkfs.ubifs.h mtd-utils-20090606/mkfs.ubifs/mkfs.ubifs.h
+--- ./mtd-utils-20090606_orig/mkfs.ubifs/mkfs.ubifs.h
++++ ./mtd-utils-20090606/mkfs.ubifs/mkfs.ubifs.h
 @@ -34,6 +34,7 @@
  #include <endian.h>
  #include <byteswap.h>
