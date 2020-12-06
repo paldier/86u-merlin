@@ -112,4 +112,5 @@ extern bool wlc_assoc_check_aplost_ok(wlc_info_t *wlc, wlc_bsscfg_t *cfg);
 extern void wlc_adopt_dtim_period(wlc_bsscfg_t *cfg, uint8 dtim_period);
 extern uint32 wlc_bss_pref_score(wlc_bsscfg_t *cfg, wlc_bss_info_t *bi, bool band_rssi_boost,
 	uint32 *prssi);
+extern int wlc_remove_assoc_req(wlc_info_t *wlc, wlc_bsscfg_t *cfg);
 #endif /* __wlc_assoc_h__ */

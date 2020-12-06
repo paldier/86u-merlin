@@ -807,6 +807,9 @@ extern void dump_WlGetDriverStats(int fb, int count);
 extern int setRogRGBLedTest(int RGB);
 #endif
 extern void hnd_set_hwstp(void);
+#ifdef RTCONFIG_BCMARM
+extern void config_mssid_isolate(char *ifname, int vif);
+#endif
 #endif
 extern int wl_max_no_vifs(int unit);
 
@@ -1012,7 +1015,7 @@ extern void lan_down(char *lan_ifname);
 extern void stop_lan_wl(void);
 extern void start_lan_wl(void);
 extern void restart_wl(void);
-extern void lanaccess_mssid_ban(const char *ifname_in);
+extern void lanaccess_mssid(const char *ifname_in, int mode);
 extern void lanaccess_wl(void);
 #ifdef RTCONFIG_FBWIFI
 extern void stop_fbwifi_check();
@@ -1756,6 +1759,10 @@ extern void stop_sshd(void);
 extern void start_wtfast(void);
 extern void stop_wtfast(void);
 #endif
+#ifdef RTCONFIG_TCPLUGIN
+extern void start_qmacc(void);
+extern void stop_qmacc(void);
+#endif
 extern void start_hotplug2(void);
 extern void stop_services(void);
 extern void stop_services_mfg(void);
@@ -2134,7 +2141,7 @@ extern void vlan_subnet_filter_forward(FILE *fp, char *wan_if);
 extern int check_exist_subnet_access_rule(int index, int subnet_group_tmp);
 extern void vlan_subnet_deny_input(FILE *fp);
 extern void vlan_subnet_deny_forward(FILE *fp);
-extern void vlan_lanaccess_mssid_ban(const char *limited_ifname, char *ip, char *netmask);
+extern void vlan_lanaccess_mssid(const char *limited_ifname, char *ip, char *netmask, int mode);
 extern void vlan_lanaccess_wl(void);
 extern int get_vlan_info_by_lanX(char *lan_prefix, int *vid, int *prio, int *portlist);
 extern void vlan_if_allow_list_set(unsigned int wan_allow_list, unsigned int lan_allow_list, unsigned int wl_allow_list);

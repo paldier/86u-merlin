@@ -45,11 +45,6 @@
 #define APILEVEL_STATUS_FW_VERSION_NOT_SUPPORT "2"
 #define APILEVEL_STATUS_END_OF_LIFE            "3"
 
-// The retry related definition for DM login and aaews running.
-#define RETRY_MAX_TIMES 4
-#define RETRY_DELAY_BASE_SECONDS 30 //seconds
-#define MAX_REG_DELAYED_SECONDS 300 //seconds
-
 #define my_memcpy(dst, src, dst_len, src_len) {memcpy(dst, src, dst_len < src_len ? dst_len : src_len);}
 
 extern char *generate_device_desc(int public, char *tnl_sdk_version, char *out_buf, int out_len);

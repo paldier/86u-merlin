@@ -173,7 +173,8 @@ void merlinr_init_done()
 //tufax3000=ax82u,ax58u=ax3000
 	//enable_4t4r();
 #elif defined(MERLINR_VER_MAJOR_X) && defined(RTAC86U)
-	merlinr_patch_nvram();
+	//merlinr_patch_nvram();//don't do it!!!!!
+	
 #elif defined(GTAC2900) && defined(MERLINR_VER_MAJOR_X)
 //ac86u <--> gtac2900
 	patch_ac86();

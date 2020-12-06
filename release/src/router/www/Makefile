@@ -428,6 +428,7 @@ ifneq ($(RTCONFIG_PARENTALCTRL),y)
 endif
 	rm -rf $(INSTALLDIR)/www/getTraffic.asp
 	rm -rf $(INSTALLDIR)/www/getWebHistory.asp
+	rm -rf $(INSTALLDIR)/www/getDBList.asp
 	rm -rf $(INSTALLDIR)/www/getAppTraffic.asp
 	rm -rf $(INSTALLDIR)/www/getWanTraffic.asp
 	rm -rf $(INSTALLDIR)/www/getAiProtectionEvent.asp
@@ -569,6 +570,12 @@ endif
 ifneq ($(RTCONFIG_WTF_REDEEM)$(RTCONFIG_WTFAST), y)
 	rm -rf $(INSTALLDIR)/www/images/New_ui/GameBoost_AiProtection.png
 	rm -rf $(INSTALLDIR)/www/images/New_ui/GameBoost_QoS.png
+endif
+
+ifneq ($(RTCONFIG_TCPLUGIN), y)
+	rm -rf $(INSTALLDIR)/www/images/tencent
+	rm -f $(INSTALLDIR)/www/GameBoost_Tencent.asp
+	rm -f $(INSTALLDIR)/www/game_accelerator_tencent.html
 endif
 
 ifneq ($(RTCONFIG_IPSEC), y)

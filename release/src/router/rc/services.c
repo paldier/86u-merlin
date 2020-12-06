@@ -697,6 +697,22 @@ void setup_passwd(void)
 	create_passwd();
 }
 
+
+static void
+nvram_fsafe_get(const char *nvram, char *nvram_buf, size_t len)
+{
+	int try = 3;
+	do {
+		if(try != 3)	// dont usleep the first time
+		{
+			dbg("[%s:(%d)]:get empty nvram(%s)\n", __FUNCTION__, __LINE__, nvram);
+			usleep(500);
+		}
+		strlcpy(nvram_buf, nvram_safe_get(nvram), len);
+		try--;
+	} while(strlen(nvram_buf) == 0 && try > 0);
+}
+
 void create_passwd(void)
 {
 	char s[512];
@@ -704,10 +720,11 @@ void create_passwd(void)
 	char salt[32];
 	FILE *f;
 	mode_t m;
-	char *http_user;
+	char http_user[128] = {0};
 #ifdef RTCONFIG_NVRAM_ENCRYPT
 	char dec_passwd[64];
 #endif
+	char passwd_buf[128] = {0};
 
 #ifdef RTCONFIG_SAMBASRV	//!!TB
 	char *smbd_user;
@@ -738,11 +755,13 @@ void create_passwd(void)
 #ifdef RTCONFIG_NVRAM_ENCRYPT
 	else{
 		memset(dec_passwd, 0, sizeof(dec_passwd));
-		pw_dec(p, dec_passwd, sizeof(dec_passwd));
+		nvram_fsafe_get("http_passwd", passwd_buf, sizeof(passwd_buf));
+		pw_dec(passwd_buf, dec_passwd, sizeof(dec_passwd));
 		p = dec_passwd;
 	}
 #endif
-	if (((http_user = nvram_get("http_username")) == NULL) || (*http_user == 0)) http_user = "admin";
+	//if (((http_user = nvram_get("http_username")) == NULL) || (*http_user == 0)) http_user = "admin";
+	nvram_fsafe_get("http_username", http_user, sizeof(http_user));
 
 #ifdef RTCONFIG_SAMBASRV	//!!TB
 	if (((smbd_user = nvram_get("smbd_user")) == NULL) || (*smbd_user == 0) || !strcmp(smbd_user, "root"))
@@ -4192,12 +4211,14 @@ start_acsd()
 	stop_acsd();
 
 	if (!restore_defaults_g && strlen(nvram_safe_get("acs_ifnames")))
-#if defined(RTCONFIG_BCM_7114) || defined(GTAC5300)
-#if defined(GTAC5300)
-		if (nvram_get_int("re_mode") == 1)
-#endif
+#if defined(RTCONFIG_BCM_7114)
 		ret = _eval(acsd_argv, NULL, 0, &pid);
 #else
+#if defined(GTAC5300)
+		if (nvram_get_int("re_mode") == 1)
+			ret = _eval(acsd_argv, NULL, 0, &pid);
+		else
+#endif
 		ret = eval("/usr/sbin/acsd");
 #endif
 
@@ -4663,15 +4684,9 @@ start_smartdns(void)
 		fprintf(fp, "server 223.5.5.5\n");
 #if !defined(K3C) && !defined(K3) && !defined(SBRAC1900P) && !defined(SBRAC3200P) && !defined(R8000P) && !defined(R7000P) && !defined(XWR3100)
 	} else {
-		if(nvram_get("smartdns_dns1") && nvram_get("smartdns_dns2") && nvram_get("smartdns_dns3")){
-			fprintf(fp, "server %s\n", nvram_get("smartdns_dns1"));
-			fprintf(fp, "server %s\n", nvram_get("smartdns_dns2"));
-			fprintf(fp, "server %s\n", nvram_get("smartdns_dns3"));
-		} else {
-			fprintf(fp, "server 8.8.8.8\n");
-			fprintf(fp, "server 208.67.222.222\n");
-			fprintf(fp, "server 1.1.1.1\n");
-		}
+		fprintf(fp, "server 8.8.8.8\n");
+		fprintf(fp, "server 208.67.222.222\n");
+		fprintf(fp, "server 1.1.1.1\n");
 	}
 #endif
 	for (unit = WAN_UNIT_FIRST; unit < WAN_UNIT_MAX; unit++) {
@@ -8679,7 +8694,11 @@ start_services(void)
 #ifdef RTCONFIG_FPROBE
 	start_fprobe();
 #endif
-
+#ifdef RTCONFIG_TCPLUGIN
+	exec_tcplugin();
+	if(nvram_match("tencent_qmacc_enable", "1") && nvram_match("tencent_eula_check", "1"))
+		start_qmacc();
+#endif
 	run_custom_script("services-start", 0, NULL, NULL);
 	nvram_set_int("sc_services_sig", 1);
 	return 0;
@@ -8919,6 +8938,9 @@ stop_services(void)
 #endif
 #ifdef RTCONFIG_NEW_USER_LOW_RSSI
 	stop_roamast();
+#endif
+#ifdef RTCONFIG_TCPLUGIN
+	stop_qmacc();
 #endif
 }
 
@@ -12228,6 +12250,20 @@ check_ddr_done:
 	else if(strcmp(script, "wtfast_rule") == 0){
 		//_dprintf("send SIGHUP to wtfast_rule SIGHUP = %d\n", SIGHUP);
 		killall("wtfslhd", SIGHUP);
+	}
+#endif
+#ifdef RTCONFIG_TCPLUGIN
+	else if (strcmp(script, "qmacc") == 0)
+	{
+		if(action & RC_SERVICE_STOP) stop_qmacc();
+		if(action & RC_SERVICE_START) start_qmacc();
+	}
+#endif
+#ifdef RTCONFIG_UUPLUGIN
+	else if (strcmp(script, "uuacc") == 0)
+	{
+		if(action & RC_SERVICE_STOP) stop_uu();
+		if(action & RC_SERVICE_START) start_uu();
 	}
 #endif
 #if defined(RTCONFIG_USB) && defined(RTCONFIG_USB_PRINTER)

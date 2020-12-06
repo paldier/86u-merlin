@@ -195,6 +195,7 @@ extern int PS_pclose(FILE *);
 #define IS_BW_QOS()             (nvram_get_int("qos_enable") == 1 && nvram_get_int("qos_type") == 2)   // Bandwidth limiter
 #define IS_GFN_QOS()            (nvram_get_int("qos_enable") == 1 && nvram_get_int("qos_type") == 3)   // GeForce NOW QoS (Nvidia)
 #define IS_NON_AQOS()           (nvram_get_int("qos_enable") == 1 && nvram_get_int("qos_type") != 1)   // non A.QoS = others QoS (T.QoS / bandwidth monitor ... etc.)
+#define IS_NON_FC_QOS()         (nvram_get_int("qos_enable") == 1 && nvram_get_int("qos_type") != 1 && nvram_get_int("qos_type") != 2) // non FC QoS= others QoS except A.QOS / BW QOS
 
 /* Guest network mark */
 #define GUEST_INIT_MARKNUM 10   /*10 ~ 30 for Guest Network. */
@@ -1591,9 +1592,25 @@ static inline int eth_wantype(int unit)
 }
 
 #ifdef CONFIG_BCMWL5
+extern int get_ifname_unit(const char* ifname, int *unit, int *subunit);
+
 static inline int guest_wlif(char *ifname)
 {
-	return strncmp(ifname, "wl", 2) == 0 && strchr(ifname, '.');
+	int unit = -1, subunit = -1;
+
+	if (!ifname || strncmp(ifname, "wl", 2)) return 0;
+
+	if (get_ifname_unit(ifname, &unit, &subunit) < 0)
+		return 0;
+
+	if (sw_mode() == SW_MODE_REPEATER && unit == nvram_get_int("wlc_band") && subunit == 1)
+		return 0;
+
+#ifdef RTCONFIG_AMAS
+	return nvram_get_int("re_mode") ? (subunit > 1) : (subunit > 0);
+#else
+	return (subunit > 0);
+#endif
 }
 #elif defined RTCONFIG_RALINK
 static inline int guest_wlif(char *ifname)

@@ -1,4 +1,4 @@
-﻿/* menuTree_bwdpi_traffic_analyzer.js */
+/* menuTree_bwdpi_traffic_analyzer.js */
 define(function(){
 	var menuTree = {
 		list: [
@@ -144,6 +144,14 @@ define(function(){
 					{url: "GameProfile.asp", tabName: "Open NAT"},
 					{url: "NULL", tabName: "__INHERIT__"}
 				] 
+			},
+			{
+				menuName: "Tencent Game Acceleration",
+				index: "menu_TencentAcceleration",
+				tab: [
+					{url: "GameBoost_Tencent.asp", tabName: "Tencent Game Acceleration"},
+					{url: "NULL", tabName: "__INHERIT__"}
+				]
 			},
 			{
 				menuName: "<#Menu_usb_application#>",
@@ -418,6 +426,7 @@ define(function(){
 					retArray.push("menu_Firewall");
 					retArray.push("menu_ParentalControl");
 					retArray.push("menu_QoS");
+					retArray.push("menu_OpenNAT");
 
 					if(!userRSSI_support){
 						retArray.push("menu_Wireless");
@@ -447,6 +456,7 @@ define(function(){
 					retArray.push("menu_Firewall");
 					retArray.push("menu_ParentalControl");
 					retArray.push("menu_QoS");
+					retArray.push("menu_OpenNAT");
 
 					if(ifttt_support || alexa_support){
 						retArray.push("menu_Alexa_IFTTT");
@@ -467,6 +477,7 @@ define(function(){
 					retArray.push("menu_Firewall");
 					retArray.push("menu_ParentalControl");
 					retArray.push("menu_QoS");
+					retArray.push("menu_OpenNAT");
 
 					if(ifttt_support || alexa_support){
 						retArray.push("menu_Alexa_IFTTT");
@@ -625,6 +636,9 @@ define(function(){
 					retArray.push("GameBoost.asp");
 				}
 
+				if(!tencent_qmacc_support)
+					retArray.push("GameBoost_Tencent.asp");
+
 				if(!alexa_support){
 					retArray.push("Advanced_Smart_Home_Alexa.asp");
 				}
@@ -698,6 +712,7 @@ define(function(){
 					retArray.push("Main_RouteStatus_Content.asp");
 					retArray.push("Main_IPTStatus_Content.asp");
 					retArray.push("Main_ConnStatus_Content.asp");
+					retArray.push("Advanced_Smart_Connect.asp");
 
 					if(userRSSI_support){
 						retArray.push("Advanced_ACL_Content.asp");
@@ -785,3 +800,4 @@ define(function(){
 
 	return menuTree;
 });
+

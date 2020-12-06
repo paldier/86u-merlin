@@ -2286,18 +2286,15 @@ void rtkl_check()
 	if(rtl_count++ >= rtl_period) {
 		rtl_count = 0;
 
-		if((rtkswitch_ioctl(GET_AWARE, 0, 0)) < 0 || rtkswitch_ioctl(GET_LANPORTS_LINK_STATUS, 0, 0) < 0) 
+		if((rtkswitch_ioctl(GET_AWARE, 0, 0)) < 0 ) 
 			rtl_fail++;
-//#if 0
+
 		if(nvram_match("rtl_dbg", "1")) {
 			_dprintf("NOW rtl_fail=%d\n", rtl_fail);
-			//_dprintf("Now rtl_fail=%d, force to 2\n", rtl_fail);
-			//rtl_fail = 2;
 		}
-//#endif
+
 		if(rtl_fail >= rtl_fail_max) {
 			logmessage("rtl_fail", "\nrtkswitch fail access, restart.\n");
-			//kill(1, SIGTERM);
 			_dprintf("rtl_fail:%d, hw reset it\n", rtl_fail);
 
 			set_gpio(10, 0);
@@ -2305,15 +2302,11 @@ void rtkl_check()
 			set_gpio(10, 1);
 
 			sleep(sltime);
-			//if(nvram_match("eval", "1"))
-			//	eval("rtkswitch", "1");
-			//else
 			rtkswitch_ioctl(INIT_SWITCH, 0, 0);
 			rtkswitch_ioctl(INIT_SWITCH_UP, 0, 0);
 			rtkswitch_ioctl(SET_EXT_TXDELAY, 1, 0);
 			rtkswitch_ioctl(SET_EXT_RXDELAY, 4, 0);
 		
-			//nvram_set("rtl_dbg", "0");
 			rtl_fail = 0;
 		}
 	}
@@ -6090,12 +6083,6 @@ static void softcenter_sig_check()
 {
 	//1=wan,2=nat,3=mount
 	if(nvram_match("sc_installed", "1")){
-		//if(!pids("perpd")){
-			//char *perp_argv[] = { "/jffs/softcenter/perp/perp.sh", "start",NULL };
-			//pid_t pid;
-			//_eval(perp_argv, NULL, 0, &pid);
-			//doSystem("sh /jffs/softcenter/perp/perp.sh start &");
-		//}
 		if(nvram_match("sc_wan_sig", "1")) {
 			if(nvram_match("sc_mount", "1")) {
 				if(f_exists("/jffs/softcenter/bin/softcenter.sh")) {
@@ -6564,7 +6551,6 @@ static void ntevent_disk_usage_check(){
 }
 #endif
 
-#ifdef RTCONFIG_FORCE_AUTO_UPGRADE
 /* DEBUG DEFINE */
 #define FAUPGRADE_DEBUG             "/tmp/FAUPGRADE_DEBUG"
 
@@ -6662,7 +6648,7 @@ static void auto_firmware_check()
 #ifdef RTCONFIG_DSL
 		eval("/usr/sbin/notif_update.sh");
 #endif
-
+#ifdef RTCONFIG_FORCE_AUTO_UPGRADE
 		if (nvram_get_int("webs_state_update")
 				&& !nvram_get_int("webs_state_error")
 				&& !nvram_get_int("webs_state_dl_error")
@@ -6704,10 +6690,14 @@ static void auto_firmware_check()
 		else{
 			FAUPGRADE_DBG("could not retrieve firmware information: webs_state_update = %d, webs_state_error = %d, webs_state_dl_error = %d, webs_state_info.len = %d", nvram_get_int("webs_state_update"), nvram_get_int("webs_state_error"), nvram_get_int("webs_state_dl_error"), strlen(nvram_safe_get("webs_state_info")));
 		}
+#else
+		period_retry = 0; //stop retry
+#endif
 		return;
 	}
+
 }
-#endif
+
 
 #if defined(RTCONFIG_LP5523) || defined(RTCONFIG_LYRA_HIDE)
 #define FILE_LP5523 "/tmp/lp5523_log"

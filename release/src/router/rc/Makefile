@@ -385,6 +385,14 @@ ifeq ($(RTCONFIG_WTFAST),y)
 OBJS += wtfast.o
 endif
 
+ifeq ($(RTCONFIG_TCPLUGIN),y)
+OBJS += qmacc.o
+endif
+
+ifeq ($(RTCONFIG_UUPLUGIN),y)
+OBJS += uu.o
+endif
+
 ifeq ($(or $(RTCONFIG_PPTPD),$(RTCONFIG_ACCEL_PPTPD)),y)
 OBJS += vpn.o
 endif
@@ -419,10 +427,9 @@ OBJS += dsl_fb.o
 endif
 endif
 ifeq ($(RTCONFIG_FRS_LIVE_UPDATE),y)
-ifneq ($(MERLINR_NAME), $(filter $(MERLINR_NAME), K3 K3C R8000P SBRAC1900P SBRAC3200P RTAC86U RTACRH17 GTAC2900))
 OBJS += frs_service.o
 endif
-endif
+
 ifeq ($(RTCONFIG_DSL),y)
 OBJS += asustest.o
 endif

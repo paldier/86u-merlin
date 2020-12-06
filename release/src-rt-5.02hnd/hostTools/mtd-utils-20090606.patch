@@ -64,3 +64,69 @@ diff -ur mtd-utils-20090606_orig/mkfs.ubifs/hashtable/hashtable_itr.h mtd-utils-
  hashtable_iterator_value(struct hashtable_itr *i)
  {
      return i->e->v;
+diff -ur mtd-utils-20090606_orig/mkfs.jffs2.c mtd-utils-20090606/mkfs.jffs2.c
+--- ./mtd-utils-20090606_orig/mkfs.jffs2.c
++++ ./mtd-utils-20090606/mkfs.jffs2.c
+@@ -49,6 +49,7 @@
+ 
+ #define _GNU_SOURCE
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <stdio.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+diff -ur mtd-utils-20090606_orig/ubi-utils/src/libubi.c mtd-utils-20090606/ubi-utils/src/libubi.c
+--- ./mtd-utils-20090606_orig/ubi-utils/src/libubi.c
++++ ./mtd-utils-20090606/ubi-utils/src/libubi.c
+@@ -30,6 +30,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <libubi.h>
+ #include "libubi_int.h"
+ #include "common.h"
+diff -ur mtd-utils-20090606_orig/ubi-utils/src/libmtd.c mtd-utils-20090606/ubi-utils/src/libmtd.c
+--- ./mtd-utils-20090606_orig/ubi-utils/src/libmtd.c
++++ ./mtd-utils-20090606/ubi-utils/src/libmtd.c
+@@ -29,6 +29,7 @@
+ #include <fcntl.h>
+ #include <dirent.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+ #include <mtd/mtd-user.h>
+diff -ur mtd-utils-20090606_orig/ubi-utils/src/libmtd_legacy.c mtd-utils-20090606/ubi-utils/src/libmtd_legacy.c
+--- ./mtd-utils-20090606_orig/ubi-utils/src/libmtd_legacy.c
++++ ./mtd-utils-20090606/ubi-utils/src/libmtd_legacy.c
+@@ -29,6 +29,7 @@
+ #include <stdlib.h>
+ #include <errno.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+ #include <mtd/mtd-user.h>
+diff -ur mtd-utils-20090606_orig/ubi-utils/old-utils/src/libubi.c mtd-utils-20090606/ubi-utils/old-utils/src/libubi.c
+--- ./mtd-utils-20090606_orig/ubi-utils/old-utils/src/libubi.c
++++ ./mtd-utils-20090606/ubi-utils/old-utils/src/libubi.c
+@@ -26,6 +26,7 @@
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h>
+ #include <dirent.h>
+ #include <errno.h>
+ #include <unistd.h>
+diff -ur mtd-utils-20090606_orig/ubi-utils/mkfs.ubifs/mkfs.ubifs.h mtd-utils-20090606/ubi-utils/mkfs.ubifs/mkfs.ubifs.h
+--- ./mtd-utils-20090606_orig/ubi-utils/mkfs.ubifs/mkfs.ubifs.h
++++ ./mtd-utils-20090606/ubi-utils/mkfs.ubifs/mkfs.ubifs.h
+@@ -34,6 +34,7 @@
+ #include <endian.h>
+ #include <byteswap.h>
+ #include <linux/types.h>
++#include <sys/sysmacros.h>
+ #include <linux/fs.h>
+ 
+ #include <getopt.h>

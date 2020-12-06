@@ -4,8 +4,11 @@
 #define RT_VERSION "3.0.0.4"
 #define RT_SERIALNO "384"
 #define RT_RCNO "3"
-#define RT_EXTENDNO "RTAC86U_R5.1.2-g689b6e7"
+#define RT_EXTENDNO "RTAC86U_R5.1.3-g807387f"
 #define RT_SWPJVERNO ""
 #define RT_BUILD_NAME "RT-AC86U"
-#define RT_BUILD_INFO "Wed Sep 16 03:46:02 UTC 2020 paldier@MerlinRdev"
+#define RT_BUILD_INFO "Sun Dec  6 04:36:49 UTC 2020 paldier@MerlinRdev"
+#endif
+#ifdef RTCONFIG_NVRAM_ENCRYPT
+#define ENC_SP_EXTENDNO "39937"
 #endif

@@ -915,7 +915,7 @@ apply.yadnsDisable = function(){
 apply.yadnsSetting = function(){
 	httpApi.nvramSet((function(){
 		qisPostData.action_mode = "apply";
-		qisPostData.rc_service = "restart_yadns";
+		qisPostData.rc_service = getRestartService();
 		return qisPostData;
 	})(), (systemVariable.isNewFw == 0) ? goTo.Finish : goTo.Update);
 };
@@ -1674,7 +1674,7 @@ goTo.autoWan = function(){
 	systemVariable.detwanResult = httpApi.detwanGetRet();
 	switch(systemVariable.detwanResult.wanType){
 		case "DHCP":
-			goTo.DHCP();
+			goTo.Waiting();
 			break;
 		case "PPPoE":
 			goTo.PPPoE();
@@ -1764,7 +1764,7 @@ goTo.rpMode = function(){
 		qisPostData.wlc_psta = 2;
 		qisPostData.wlc_dpsta = 1;
 	}
-	else if((isSdk("7") || isSdk("9")) && isSupport("bcmwifi")){
+	else if(isSupport("amas") && isSupport("bcmwifi")){
 		qisPostData.sw_mode = 3;
 		qisPostData.wlc_psta = 2;
 		qisPostData.wlc_dpsta = 0;
@@ -2947,7 +2947,7 @@ goTo.NoWan = function(){
 				goTo.Wireless();
 				break;
 			case "DHCP":
-				goTo.DHCP();
+				goTo.Waiting();
 				break;
 			case "PPPoE":
 				goTo.PPPoE();
@@ -3000,22 +3000,34 @@ goTo.ResetModem = function(){
 
 goTo.Waiting = function(){
 	systemVariable.manualWanSetup = false;
-
+	var wandog_interval_str = httpApi.nvramGet(["wandog_interval"], true).wandog_interval;
+	var wandog_interval = (wandog_interval_str == "") ? 5: parseInt(wandog_interval_str);
 	var errCount = 0;
+	var check_linkInternet_count = 0;
+	var MAX_WAN_Detection = wandog_interval * 4;
+	var MAX_LinkInternet_Detection = wandog_interval;
+
 	setTimeout(function(){
 		if(systemVariable.manualWanSetup) return false;
 
-		if(errCount > 10){
+		if(errCount > MAX_WAN_Detection || check_linkInternet_count > MAX_LinkInternet_Detection){
 			if(isSupport("nowan"))
 				goTo.Modem();
 			else
 				goTo.WAN();
+
 			return false;
 		}
 
+		systemVariable.detwanResult = httpApi.detwanGetRet();
 		if(systemVariable.detwanResult.wanType == "" || systemVariable.detwanResult.wanType == "CHECKING"){
 			errCount++;
-			systemVariable.detwanResult = httpApi.detwanGetRet();
+			if(isPage("waiting_page")) setTimeout(arguments.callee, 1000);
+			return false;
+		}
+		else if(systemVariable.detwanResult.wanType == "DHCP"){
+			errCount = 0;
+			check_linkInternet_count++;
 			if(isPage("waiting_page")) setTimeout(arguments.callee, 1000);
 			return false;
 		}
@@ -3023,7 +3035,7 @@ goTo.Waiting = function(){
 		if(isPage("waiting_page")) goTo.autoWan();
 	}, 1000);
 
-	goTo.loadPage("waiting_page", false);	
+	goTo.loadPage("waiting_page", false);
 };
 
 goTo.leaveQIS = function(){

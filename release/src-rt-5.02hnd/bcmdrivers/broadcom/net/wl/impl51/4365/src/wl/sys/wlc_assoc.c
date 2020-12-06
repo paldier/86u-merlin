@@ -523,19 +523,14 @@ wlc_assoc_req_process_next(wlc_info_t *wlc)
 	}
 }
 
-static int
-wlc_assoc_req_remove_entry(wlc_info_t *wlc, wlc_bsscfg_t *cfg)
+int
+wlc_remove_assoc_req(wlc_info_t *wlc, wlc_bsscfg_t *cfg)
 {
 #if defined(BCMDBG) || defined(WLMSG_ASSOC)
 	char ssidbuf[SSID_FMT_BUF_LEN];
 #endif
 	int i;
 	int err = BCME_ERROR;
-	bool as_in_progress_already;
-
-	/* check the current state of assoc_req array */
-	/* mark to see whether it's null or not */
-	as_in_progress_already = AS_IN_PROGRESS(wlc);
 
 	for (i = 0; i < WLC_MAXBSSCFG; i ++) {
 		if (wlc->as_info->assoc_req[i] != cfg)
@@ -558,6 +553,21 @@ wlc_assoc_req_remove_entry(wlc_info_t *wlc, wlc_bsscfg_t *cfg)
 		err = BCME_OK;
 		break;
 	}
+
+	return err;
+}
+
+static int
+wlc_assoc_req_remove_entry(wlc_info_t *wlc, wlc_bsscfg_t *cfg)
+{
+	int err = BCME_ERROR;
+	bool as_in_progress_already;
+
+	/* check the current state of assoc_req array */
+	/* mark to see whether it's null or not */
+	as_in_progress_already = AS_IN_PROGRESS(wlc);
+
+	err = wlc_remove_assoc_req(wlc, cfg);
 
 	/* if we cleared the wlc->as_info->assoc_req[] list, update ps_ctrl */
 	if (as_in_progress_already != AS_IN_PROGRESS(wlc)) {

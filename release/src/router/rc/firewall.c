@@ -85,7 +85,7 @@ const int allowed_local_icmpv6[] =
 #endif
 
 #ifdef RTCONFIG_VPN_FUSION
-extern int write_vpn_fusion(FILE *fp, const char* lan_ip);
+extern int write_vpn_fusion_nat(FILE *fp, const char* lan_ip);
 #endif
 
 char *mac_conv(char *mac_name, int idx, char *buf);	// oleg patch
@@ -1679,7 +1679,7 @@ void nat_setting(char *wan_if, char *wan_ip, char *wanx_if, char *wanx_ip, char 
 #endif
 
 #ifdef RTCONFIG_VPN_FUSION
-        write_vpn_fusion(fp, lan_ip);
+        write_vpn_fusion_nat(fp, lan_ip);
 #endif
 
 #ifdef RTCONFIG_YANDEXDNS
@@ -2765,6 +2765,7 @@ void write_UrlFilter(char *chain, char *lan_if, char *lan_ip, char *logdrop, FIL
 
 	char *ptr, *p, *pvalue;
 	char list[256], list2[256];
+	int first;
 
 	snprintf(config_rule, sizeof(config_rule), "-d %s", lan_ip);
 #ifdef RTCONFIG_IPV6
@@ -2808,10 +2809,17 @@ void write_UrlFilter(char *chain, char *lan_if, char *lan_ip, char *logdrop, FIL
 				memset(list2, 0, sizeof(list2));
 
 				ptr = pvalue = strdup(url);
+				first = 1;
 				while (pvalue && (p = strsep(&pvalue, ".")) != NULL) {
 					if (!strlen(p)) {
 						pvalue++;
 						continue;
+					}
+
+					if (first) {
+						first = 0;
+						if (!strncasecmp(p, "www", 3))
+							continue;
 					}
 
 					snprintf(list2, sizeof(list2), "%s|%02x|%s", list, strlen(p), p);
@@ -2842,10 +2850,17 @@ void write_UrlFilter(char *chain, char *lan_if, char *lan_ip, char *logdrop, FIL
 					memset(list2, 0, sizeof(list2));
 
 					ptr = pvalue = strdup(url);
+					first = 1;
 					while (pvalue && (p = strsep(&pvalue, ".")) != NULL) {
 						if (!strlen(p)) {
 							pvalue++;
 							continue;
+						}
+
+						if (first) {
+							first = 0;
+							if (!strncasecmp(p, "www", 3))
+								continue;
 						}
 
 						snprintf(list2, sizeof(list2), "%s|%02x|%s", list, strlen(p), p);

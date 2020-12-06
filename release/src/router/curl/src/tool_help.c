@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 #include "tool_setup.h"
-#ifdef HAVE_STRCASECMP
+#if defined(HAVE_STRCASECMP) && defined(HAVE_STRINGS_H)
 #include <strings.h>
 #endif
 
@@ -191,6 +191,8 @@ static const struct helptxt helptext[] = {
    "Use HTTP 2"},
   {"    --http2-prior-knowledge",
    "Use HTTP 2 without HTTP/1.1 Upgrade"},
+  {"    --http3",
+   "Use HTTP v3"},
   {"    --ignore-content-length",
    "Ignore the size of the remote resource"},
   {"-i, --include",
@@ -261,6 +263,8 @@ static const struct helptxt helptext[] = {
    "Disable TCP keepalive on the connection"},
   {"    --no-npn",
    "Disable the NPN TLS extension"},
+  {"    --no-progress-meter",
+   "Do not show the progress meter"},
   {"    --no-sessionid",
    "Disable SSL session-ID reusing"},
   {"    --noproxy <no-proxy-list>",
@@ -273,6 +277,10 @@ static const struct helptxt helptext[] = {
    "OAuth 2 Bearer Token"},
   {"-o, --output <file>",
    "Write to file instead of stdout"},
+  {"-Z, --parallel",
+   "Perform transfers in parallel"},
+  {"    --parallel-max",
+   "Maximum concurrency for parallel transfers"},
   {"    --pass <phrase>",
    "Pass phrase for the private key"},
   {"    --path-as-is",
@@ -385,6 +393,8 @@ static const struct helptxt helptext[] = {
    "Wait time between retries"},
   {"    --retry-max-time <seconds>",
    "Retry only within this period"},
+  {"    --sasl-authzid <identity> ",
+   "Use this identity to act as during SASL PLAIN authentication"},
   {"    --sasl-ir",
    "Enable initial response in SASL authentication"},
   {"    --service-name <name>",
@@ -526,11 +536,13 @@ static const struct feat feats[] = {
   {"CharConv",       CURL_VERSION_CONV},
   {"TLS-SRP",        CURL_VERSION_TLSAUTH_SRP},
   {"HTTP2",          CURL_VERSION_HTTP2},
+  {"HTTP3",          CURL_VERSION_HTTP3},
   {"UnixSockets",    CURL_VERSION_UNIX_SOCKETS},
   {"HTTPS-proxy",    CURL_VERSION_HTTPS_PROXY},
   {"MultiSSL",       CURL_VERSION_MULTI_SSL},
   {"PSL",            CURL_VERSION_PSL},
   {"alt-svc",        CURL_VERSION_ALTSVC},
+  {"ESNI",           CURL_VERSION_ESNI},
 };
 
 void tool_help(void)
@@ -602,8 +614,9 @@ void tool_version_info(void)
   }
 }
 
-void tool_list_engines(CURL *curl)
+void tool_list_engines(void)
 {
+  CURL *curl = curl_easy_init();
   struct curl_slist *engines = NULL;
 
   /* Get the list of engines */
@@ -620,4 +633,5 @@ void tool_list_engines(CURL *curl)
 
   /* Cleanup the list of engines */
   curl_slist_free_all(engines);
+  curl_easy_cleanup(curl);
 }

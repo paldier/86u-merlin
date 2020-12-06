@@ -3973,6 +3973,10 @@
 			>
 			</File>
 			<File
+				RelativePath="..\..\..\..\lib\socketpair.c"
+			>
+			</File>
+			<File
 				RelativePath="..\..\..\..\lib\socks.c"
 			>
 			</File>
@@ -3990,14 +3994,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\splay.c"
-			>
-			</File>
-			<File
-				RelativePath="..\..\..\..\lib\ssh.c"
-			>
-			</File>
-			<File
-				RelativePath="..\..\..\..\lib\ssh-libssh.c"
 			>
 			</File>
 			<File
@@ -4381,6 +4377,10 @@
 			>
 			</File>
 			<File
+				RelativePath="..\..\..\..\lib\quic.h"
+			>
+			</File>
+			<File
 				RelativePath="..\..\..\..\lib\rand.h"
 			>
 			</File>
@@ -4426,6 +4426,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\sockaddr.h"
+			>
+			</File>
+			<File
+				RelativePath="..\..\..\..\lib\socketpair.h"
 			>
 			</File>
 			<File

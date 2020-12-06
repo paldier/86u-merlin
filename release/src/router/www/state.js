@@ -585,6 +585,7 @@ var re_mode = '<% nvram_get("re_mode"); %>';
 var conndiag_support = (function(){
 	return (isSupport("conndiag") && ('<% nvram_get("enable_diag"); %>' == "2"));
 })();
+var tencent_qmacc_support = isSupport("tencent_qmacc");
 
 var amazon_wss_support = isSupport("amazon_wss");
 

@@ -1086,6 +1086,10 @@ SOURCE=..\..\..\..\lib\smtp.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\socketpair.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\socks.c
 # End Source File
 # Begin Source File
@@ -1103,14 +1107,6 @@ SOURCE=..\..\..\..\lib\speedcheck.c
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\splay.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\ssh.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\ssh-libssh.c
 # End Source File
 # Begin Source File
 
@@ -1594,6 +1590,10 @@ SOURCE=..\..\..\..\lib\psl.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\quic.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\rand.h
 # End Source File
 # Begin Source File
@@ -1639,6 +1639,10 @@ SOURCE=..\..\..\..\lib\smtp.h
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\sockaddr.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\socketpair.h
 # End Source File
 # Begin Source File
 

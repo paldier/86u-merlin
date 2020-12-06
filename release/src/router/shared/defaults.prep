@@ -13430,7 +13430,7 @@ extern int notify_ahs_and_wait(const char *event_name);
 extern int notify_ahs_and_wait_1min(const char *event_name);
 extern int notify_ahs_and_wait_2min(const char *event_name);
 # 57 "./shared.h" 2
-# 269 "./shared.h"
+# 270 "./shared.h"
 extern const char *rt_version;
 extern const char *rt_serialno;
 extern const char *rt_rcno;
@@ -13440,7 +13440,7 @@ extern const char *rt_buildinfo;
 extern const char *rt_swpjverno;
 
 extern void set_basic_fw_name(void);
-# 293 "./shared.h"
+# 294 "./shared.h"
 enum {
  IPV6_DISABLED = 0,
  IPV6_NATIVE_DHCP,
@@ -13450,7 +13450,7 @@ enum {
  IPV6_MANUAL,
  IPV6_PASSTHROUGH
 };
-# 386 "./shared.h"
+# 387 "./shared.h"
 enum romaingEvent {
  EID_RM_STA_MON = 1,
  EID_RM_STA_MON_REPORT = 2,
@@ -13465,7 +13465,7 @@ enum conndiagEvent {
  EID_CD_STA_CHK_ONE_RSP,
  EID_CD_MAX
 };
-# 464 "./shared.h"
+# 465 "./shared.h"
 enum {
  FROM_BROWSER,
  FROM_ASUSROUTER,
@@ -13502,9 +13502,9 @@ typedef struct {
  int count;
  struct {
   char name[
-# 499 "./shared.h" 3 4
+# 500 "./shared.h" 3 4
            16 
-# 499 "./shared.h"
+# 500 "./shared.h"
                     + 1];
   char ip[sizeof("xxx.xxx.xxx.xxx") + 1];
  } iface[2];
@@ -13515,14 +13515,14 @@ struct ip_mask_s {
  uint32_t ip;
  uint32_t cidr;
 };
-# 579 "./shared.h"
+# 580 "./shared.h"
 extern char *read_whole_file(const char *target);
 extern char *get_line_from_buffer(const char *buf, char *line, const int line_size);
 
 
 size_t strlcpy(char *dst, const char *src, size_t size);
 size_t strlcat(char *dst, const char *src, size_t size);
-# 595 "./shared.h"
+# 596 "./shared.h"
 static inline char * strlcat_r(const char *s1, const char *s2, char *buf, const size_t buf_len)
 {
         strlcpy(buf, s1, buf_len);
@@ -13642,11 +13642,11 @@ extern int find_label_or_uuid(char *device, char *label, char *uuid);
 extern struct mntent *findmntents(char *file, int swp,
  int (*func)(struct mntent *mnt, uint flags), uint flags);
 extern void add_remove_usbhost(char *host, int add);
-# 728 "./shared.h"
+# 729 "./shared.h"
 typedef int (*host_exec)(char *dev_name, int host_num, char *dsc_name, char *pt_name, uint flags);
 extern int exec_for_host(int host, int obsolete, uint flags, host_exec func);
 extern int is_no_partition(const char *discname);
-# 741 "./shared.h"
+# 742 "./shared.h"
 enum {
  MODEL_GENERIC = -1,
  MODEL_UNKNOWN = 0,
@@ -13700,7 +13700,7 @@ enum {
  MODEL_RTN66U,
  MODEL_RTAC66U,
  MODEL_RTAC68U,
- MODEL_unused794,
+ MODEL_unused795,
  MODEL_RTAC87U,
  MODEL_RTAC56S,
  MODEL_RTAC56U,
@@ -13789,7 +13789,7 @@ enum {
  SWITCH_RTL8367RB,
  SWITCH_RTL8370M,
 };
-# 891 "./shared.h"
+# 892 "./shared.h"
 enum {
  HW_BCM4702,
  HW_BCM4712,
@@ -13809,7 +13809,7 @@ enum {
  HW_BCM4785,
  HW_UNKNOWN
 };
-# 920 "./shared.h"
+# 921 "./shared.h"
 extern int check_hw_type(void);
 
 extern int get_model(void);
@@ -13834,7 +13834,7 @@ extern int _file_lock(const char *dir, const char *tag);
 extern int _file_unlock(int lockfd);
 extern int file_lock(const char *tag);
 extern void file_unlock(int lockfd);
-# 952 "./shared.h"
+# 953 "./shared.h"
 extern unsigned long f_size(const char *path);
 extern int f_exists(const char *path);
 extern int l_exists(const char *path);
@@ -13867,7 +13867,7 @@ enum btn_id {
  BTN_WPS,
  BTN_FAN,
  BTN_HAVE_FAN,
-# 993 "./shared.h"
+# 994 "./shared.h"
  BTN_WIFI_TOG,
 
 
@@ -13875,10 +13875,10 @@ enum btn_id {
 
 
  BTN_LED,
-# 1009 "./shared.h"
+# 1010 "./shared.h"
  BTN_ID_MAX,
 };
-# 1030 "./shared.h"
+# 1031 "./shared.h"
 enum led_id {
  LED_POWER = 0,
 
@@ -13925,7 +13925,7 @@ enum led_id {
 
 
  LED_SATA,
-# 1171 "./shared.h"
+# 1172 "./shared.h"
  PWR_USB,
 
 
@@ -13976,9 +13976,9 @@ static inline int have_usb3_led(int model)
  }
  return 0;
 }
-# 1233 "./shared.h"
+# 1234 "./shared.h"
 static inline int have_sata_led(__attribute__ ((unused)) int model) { return 0; }
-# 1265 "./shared.h"
+# 1266 "./shared.h"
 enum wl_band_id {
  WL_2G_BAND = 0,
  WL_5G_BAND = 1,
@@ -13987,12 +13987,12 @@ enum wl_band_id {
 
  WL_NR_BANDS
 };
-# 1298 "./shared.h"
+# 1299 "./shared.h"
 static inline int absent_band(enum wl_band_id band)
 {
  if (band < WL_2G_BAND || band >= WL_NR_BANDS)
   return 1;
-# 1315 "./shared.h"
+# 1316 "./shared.h"
  if (band == WL_60G_BAND)
   return 1;
 
@@ -14017,7 +14017,7 @@ static inline int aimesh_re_node(void)
 {
  return __aimesh_re_node((nvram_get("sw_mode") ? nvram_get_int("sw_mode") : SW_MODE_ROUTER));
 }
-# 1399 "./shared.h"
+# 1400 "./shared.h"
 static inline int __access_point_mode(int sw_mode)
 {
  return (sw_mode == SW_MODE_AP
@@ -14055,7 +14055,7 @@ static inline int mediabridge_mode(void)
 {
  return __mediabridge_mode((nvram_get("sw_mode") ? nvram_get_int("sw_mode") : SW_MODE_ROUTER));
 }
-# 1451 "./shared.h"
+# 1452 "./shared.h"
 static inline int client_mode(void)
 {
  if (repeater_mode() || mediabridge_mode()
@@ -14132,7 +14132,7 @@ static inline int dualwan_unit__nonusbif(int unit)
 }
 extern int get_usbif_dualwan_unit(void);
 extern int get_primaryif_dualwan_unit(void);
-# 1580 "./shared.h"
+# 1581 "./shared.h"
 static inline int eth_wantype(int unit)
 {
  int type = get_dualwan_by_unit(unit);
@@ -14147,11 +14147,27 @@ static inline int eth_wantype(int unit)
 }
 
 
+extern int get_ifname_unit(const char* ifname, int *unit, int *subunit);
+
 static inline int guest_wlif(char *ifname)
 {
- return strncmp(ifname, "wl", 2) == 0 && strchr(ifname, '.');
+ int unit = -1, subunit = -1;
+
+ if (!ifname || strncmp(ifname, "wl", 2)) return 0;
+
+ if (get_ifname_unit(ifname, &unit, &subunit) < 0)
+  return 0;
+
+ if ((nvram_get("sw_mode") ? nvram_get_int("sw_mode") : SW_MODE_ROUTER) == SW_MODE_REPEATER && unit == nvram_get_int("wlc_band") && subunit == 1)
+  return 0;
+
+
+ return nvram_get_int("re_mode") ? (subunit > 1) : (subunit > 0);
+
+
+
 }
-# 1703 "./shared.h"
+# 1720 "./shared.h"
 extern int init_gpio(void);
 extern int set_pwr_usb(int boolOn);
 
@@ -14199,7 +14215,7 @@ extern char *get_5g_hwaddr(void);
 extern char *get_lan_hwaddr(void);
 extern char *get_wan_hwaddr(void);
 extern char *get_label_mac(void);
-# 1789 "./shared.h"
+# 1806 "./shared.h"
 extern char *get_wlifname(int unit, int subunit, int subunit_x, char *buf);
 extern char *get_wlxy_ifname(int x, int y, char *buf);
 
@@ -14244,7 +14260,7 @@ extern int wl_get_bw(int unit);
 
 
 extern int get_psta_status(int unit);
-# 1960 "./shared.h"
+# 1977 "./shared.h"
 extern int config_rtkswitch(int argc, char *argv[]);
 extern unsigned int rtkswitch_lanPorts_phyStatus(void);
 
@@ -14263,7 +14279,7 @@ extern char *set_steer(char *mac,int val);
 
 
 static inline void set_power_save_mode(void) { }
-# 1987 "./shared.h"
+# 2004 "./shared.h"
 extern uint32_t hnd_get_phy_status(int port, int offs, unsigned int regv, unsigned int pmdv);
 extern uint32_t hnd_get_phy_speed(int port, int offs, unsigned int regv, unsigned int pmdv);
 extern int hnd_ethswctl(ecmd_t act, unsigned int val, int len, int wr, unsigned long long regdata);
@@ -14345,7 +14361,7 @@ extern int check_if_dir_writable(const char *dir);
 extern unsigned int __dir_size__;
 extern int sum(const char *fpath, const struct stat *sb, int typeflag);
 extern int d_size(const char *dirPath);
-# 2092 "./shared.h"
+# 2109 "./shared.h"
 static inline int is_aqr_phy_exist(void)
 {
 
@@ -14419,9 +14435,9 @@ extern int psr_exist_except(int unit);
 
 struct ifino_s {
  char ifname[
-# 2164 "./shared.h" 3 4
+# 2181 "./shared.h" 3 4
             16
-# 2164 "./shared.h"
+# 2181 "./shared.h"
                     ];
  ino_t inode;
  unsigned long long last_rx, last_tx;
@@ -14438,7 +14454,7 @@ extern ino_t get_iface_inode(const char *ifname);
 extern unsigned int netdev_calc(char *ifname, char *ifname_desc, unsigned long long *rx, unsigned long long *tx, char *ifname_desc2, unsigned long long *rx2, unsigned long long *tx2, char *nv_lan_ifname, char *nv_lan_ifnames);
 extern void disable_dpi_engine_setting(void);
 extern int get_iface_hwaddr(char *name, unsigned char *hwaddr);
-# 2196 "./shared.h"
+# 2213 "./shared.h"
 static inline int __set_iface_ps(__attribute__ ((unused)) const char *ifname, __attribute__ ((unused)) int nr_rx_mask,
  __attribute__ ((unused)) const unsigned int *rx_mask, __attribute__ ((unused)) int nr_tx_mask,
  __attribute__ ((unused)) const unsigned int *tx_mask) { return 0; }
@@ -14463,9 +14479,9 @@ extern void set_no_internet_ready(void);
 extern unsigned int num_of_mssid_support(unsigned int unit);
 extern enum led_id get_wl_led_id(int band);
 extern char *get_wl_led_gpio_nv(int band);
-# 2232 "./shared.h"
+# 2249 "./shared.h"
 static inline char *get_wsup_drvname(__attribute__ ((unused)) int band) { return ""; }
-# 2248 "./shared.h"
+# 2265 "./shared.h"
 extern void run_custom_script(char *name, int timeout, char *arg1, char *arg2);
 extern void run_postconf(char *name, char *config);
 extern void use_custom_config(char *config, char *target);
@@ -14477,7 +14493,7 @@ extern int stricmp(char const *a, char const *b, int len);
 extern int isValid_digit_string(const char *string);
 extern int is_valid_hostname(const char *name);
 extern int is_valid_domainname(const char *name);
-# 2268 "./shared.h"
+# 2285 "./shared.h"
 extern void ATE_mt7628_esw_port_status(void);
 
 
@@ -14533,7 +14549,7 @@ extern void add_wan_phy(char *phy);
 
 
 extern void init_spinlock(void);
-# 2335 "./shared.h"
+# 2352 "./shared.h"
 static inline int wps_led_control(int onoff)
 {
  if (nvram_get_int("led_pwr_gpio") != nvram_get_int("led_wps_gpio"))
@@ -14554,34 +14570,34 @@ enum {
  YADNS_COUNT,
  YADNS_FIRST = YADNS_DISABLED + 1,
 };
-# 2367 "./shared.h"
+# 2384 "./shared.h"
 static inline int power_red_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2376 "./shared.h"
+# 2393 "./shared.h"
 static inline int failover_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2385 "./shared.h"
+# 2402 "./shared.h"
 static inline int wigig_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2394 "./shared.h"
+# 2411 "./shared.h"
 static inline int sata_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2403 "./shared.h"
+# 2420 "./shared.h"
 static inline int r10g_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2412 "./shared.h"
+# 2429 "./shared.h"
 static inline int sfpp_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2421 "./shared.h"
+# 2438 "./shared.h"
 static inline int wan_red_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2430 "./shared.h"
+# 2447 "./shared.h"
 static inline int wan2_red_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2439 "./shared.h"
+# 2456 "./shared.h"
 static inline int logo_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2448 "./shared.h"
+# 2465 "./shared.h"
 static inline int all_led_control(__attribute__ ((unused)) int onoff) { return 0; }
-# 2468 "./shared.h"
+# 2485 "./shared.h"
 static inline int turbo_led_control(__attribute__ ((unused)) int onoff) { return 0; }
 static inline int boost_led_control(__attribute__ ((unused)) int onoff) { return 0; }
 
 
 
 static inline int inhibit_led_on(void) { return !nvram_get_int("AllLED"); }
-# 2614 "./shared.h"
+# 2631 "./shared.h"
 static inline int __config_netdev_bled(__attribute__ ((unused)) const char *led_gpio, __attribute__ ((unused)) const char *ifname, __attribute__ ((unused)) unsigned int min_blink_speed, __attribute__ ((unused)) unsigned int interval) { return 0; }
 static inline int config_netdev_bled(__attribute__ ((unused)) const char *led_gpio, __attribute__ ((unused)) const char *ifname) { return 0; }
 static inline int set_bled_udef_pattern(__attribute__ ((unused)) const char *led_gpio, __attribute__ ((unused)) unsigned int interval, __attribute__ ((unused)) const char *pattern) { return 0; }
@@ -14625,16 +14641,16 @@ static inline int is_usb3_port(char *usb_node)
 {
  if (!usb_node)
   return 0;
-# 2667 "./shared.h"
+# 2684 "./shared.h"
  if (strstr(usb_node, get_usb_xhci_port(0)) || strstr(usb_node, get_usb_xhci_port(1)))
   return 1;
 
  return 0;
 
 }
-# 2687 "./shared.h"
+# 2704 "./shared.h"
 static inline int is_m2ssd_port(__attribute__ ((unused)) char *usb_node) { return 0; }
-# 2744 "./shared.h"
+# 2761 "./shared.h"
 extern char *get_default_ssid(int unit, int subunit);
 
 extern int wanport_status(int wan_unit);
@@ -14651,7 +14667,20 @@ extern int pw_enc(const char *input, char *output);
 extern int pw_dec(const char *input, char *output, int len);
 extern int pw_enc_blen(const char *input);
 extern int pw_dec_len(const char *input);
-# 2774 "./shared.h"
+
+
+
+
+extern int set_enc_nvram(char *name, char *input, char *output);
+extern int enc_nvram(char *name, char *input, char *output);
+extern int dec_nvram(char *name, char *input, char *output);
+extern int start_enc_nvram(void);
+extern int start_dec_nvram(void);
+extern int init_enc_nvram(void);
+
+
+
+
 extern int is_wlsta_connect(int unit, int vidx, char *macaddr);
 extern void set_deauth_sta(int bssidx, int vifidx, char *mac_addr);
 
@@ -14709,7 +14738,7 @@ enum {
  CKN_ENC_DEFAULT = 0,
  CKN_ENC_SVR
 };
-# 2839 "./shared.h"
+# 2856 "./shared.h"
 extern int is_valid_group_id(const char *);
 extern char *if_nametoalias(char *name, char *alias, int alias_len);
 extern int check_re_in_macfilter(int unit, char *mac);
@@ -14722,7 +14751,7 @@ extern void update_macfilter_relist();
 
 
 extern int IPTV_ports_cnt(void);
-# 2859 "./shared.h"
+# 2876 "./shared.h"
 enum {
  UI_SW_MODE_NONE=0,
  UI_SW_MODE_ROUTER,
@@ -14767,7 +14796,7 @@ static inline int get_sw_mode(void)
 
  return UI_SW_MODE_NONE;
 }
-# 2919 "./shared.h"
+# 2936 "./shared.h"
 extern int getAmasSupportMode();
 
 
@@ -14790,7 +14819,7 @@ typedef struct __amaslib_notification__t_
  int flag;
  char ip[16];
 } AMASLIB_EVENT_T;
-# 2953 "./shared.h"
+# 2970 "./shared.h"
 extern int AMAS_EVENT_TRIGGER(char *sta2g, char *sta5g, int flag);
 extern int is_amaslib_enabled();
 
@@ -16214,9 +16243,8 @@ struct nvram_tuple router_defaults[] = {
  { "http_lanport", "80", CKN_STR5, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
  { "https_lanport", "8443", CKN_STR5, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
- { "https_crt_file", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
- { "https_crt_save", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
- { "https_crt_gen", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+ { "https_crt_save", "1", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+ { "https_crt_gen", "1", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "https_crt_cn", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "webs_last_info", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "firmware_path", "", CKN_STR128, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16229,7 +16257,7 @@ struct nvram_tuple router_defaults[] = {
  { "x_Setting", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "r_Setting", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "w_Setting", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2405 "defaults.c"
+# 2404 "defaults.c"
  { "asus_mfg", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "asus_mfg_flash", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
@@ -16249,7 +16277,7 @@ struct nvram_tuple router_defaults[] = {
 
  { "btn_led", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "btn_led_mode", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2461 "defaults.c"
+# 2460 "defaults.c"
  { "record_lanaddr", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "telnetd_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
@@ -16298,7 +16326,7 @@ struct nvram_tuple router_defaults[] = {
  { "modem_running", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
  { "modem_pincode_opt", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2523 "defaults.c"
+# 2522 "defaults.c"
  { "modem_limit_unit", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "modem_warning_unit", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "modem_sms_limit", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16312,14 +16340,18 @@ struct nvram_tuple router_defaults[] = {
  { "modem_bytes_data_warning", "0", CKN_STR128, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "modem_bytes_data_save", "1800", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
+
+
+
  { "modem_mtu", "0", CKN_STR5, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+
 
  { "data_usage", "3", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "data_usage_cycle", "30", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "data_usage_limit", "8", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "data_usage_warning", "6", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "modem_idletime", "600", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2555 "defaults.c"
+# 2558 "defaults.c"
  { "udpxy_enable_x", "0", CKN_STR5, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "udpxy_clients", "10", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
@@ -16337,7 +16369,7 @@ struct nvram_tuple router_defaults[] = {
  { "http_id", "TIDe855a6487043d70a", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
  { "env_path", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2581 "defaults.c"
+# 2584 "defaults.c"
  { "debug_cprintf", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
 
@@ -16380,7 +16412,7 @@ struct nvram_tuple router_defaults[] = {
  { "vpnc_connect_row", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "vpnc_auto_conn", "", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "vpnc_pptp_options_x_list", "", CKN_STR2048, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2635 "defaults.c"
+# 2638 "defaults.c"
  { "VPNServer_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "VPNServer_mode", "pptpd", CKN_STR8, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "VPNClient_rule", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16555,10 +16587,10 @@ struct nvram_tuple router_defaults[] = {
  { "dblog_log_path", "", CKN_STR128, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "dblog_msqid_to_d", "0", CKN_STR32, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "dblog_transid", "0123456789ABCDEF", CKN_STR16, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2821 "defaults.c"
+# 2824 "defaults.c"
  { "fb_ptype", "", CKN_STR64, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "fb_pdesc", "", CKN_STR64, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2841 "defaults.c"
+# 2844 "defaults.c"
  { "ipv6_service", "disabled", CKN_STR16, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "ipv6_ifdev", "ppp", CKN_STR4, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "ipv6_prefix", "", CKN_STR39, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16651,7 +16683,7 @@ struct nvram_tuple router_defaults[] = {
  { "web_redirect", "3", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "disiosdet", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "nat_redirect_enable", "1", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 2953 "defaults.c"
+# 2956 "defaults.c"
  { "Ate_version", "1.0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "Ate_power_on_off_ver", "2.4", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "Ate_power_on_off_enable", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16667,7 +16699,7 @@ struct nvram_tuple router_defaults[] = {
  { "dev_fail_reboot", "3", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
  { "Ate_check_delay", "3", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0},
-# 3013 "defaults.c"
+# 3016 "defaults.c"
  { "timemachine_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "tm_device_name", "", CKN_STR64, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "tm_vol_size", "0", CKN_STR8, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16677,7 +16709,7 @@ struct nvram_tuple router_defaults[] = {
  { "tm_usb_path_pid", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "tm_usb_path_serial", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "tm_debug", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3040 "defaults.c"
+# 3043 "defaults.c"
  { "Ate_fw_fail", "10", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
 
@@ -16708,12 +16740,12 @@ struct nvram_tuple router_defaults[] = {
  { "nmp_client_list", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "ttl_inc_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "ttl_spoof_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3078 "defaults.c"
+# 3081 "defaults.c"
  { "custom_usericon", "", CKN_STR_MAX, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "custom_usericon_del", "", CKN_STR4096, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3095 "defaults.c"
+# 3098 "defaults.c"
  { "enable_cloudcheck", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3112 "defaults.c"
+# 3115 "defaults.c"
  { "wtf_username", "", CKN_STR256, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "wtf_passwd", "", CKN_STR256, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "wtf_rulelist", "", CKN_STR2048, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16767,7 +16799,7 @@ struct nvram_tuple router_defaults[] = {
  { "zebra_enpasswd", "zebra", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_SVR, 0 },
  { "rip_hostname", "ripd", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "rip_passwd", "zebra", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_SVR, 0 },
-# 3173 "defaults.c"
+# 3176 "defaults.c"
  { "lb_skip_port", "<HTTPS>443>TCP<HTTPS>8443>TCP<QUIC>443>UDP<QUIC>80>UDP", CKN_STR1024, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
 
@@ -16778,7 +16810,7 @@ struct nvram_tuple router_defaults[] = {
  { "subnet_rulelist_ext", "", CKN_STR2048, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "vlan_pvid_list", "", CKN_STR4096, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "gvlan_rulelist", "", CKN_STR4096, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3193 "defaults.c"
+# 3196 "defaults.c"
  { "atcover_sip", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "atcover_sip_ip", "192.168.1.1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "atcover_sip_type", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16788,6 +16820,7 @@ struct nvram_tuple router_defaults[] = {
  { "le_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_acme_auth", "http", CKN_STR10, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_acme_force", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+ { "le_acme_renew_force", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_acme_logpath", "", CKN_STR128, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_acme_debug", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_acme_stage", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16801,7 +16834,12 @@ struct nvram_tuple router_defaults[] = {
 
  { "cfg_recount", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "cfg_relist", "", CKN_STR4096, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3258 "defaults.c"
+# 3257 "defaults.c"
+ { "nvram_encrypt", "1", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+
+
+
+
  { "usb_idle_enable", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "usb_idle_timeout", "60", CKN_STR4, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "usb_idle_exclude", "", CKN_STR10, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16813,8 +16851,15 @@ struct nvram_tuple router_defaults[] = {
 
  { "uiFlag", "1", CKN_STR32, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "rog_clientlist", "", CKN_STR1024, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3287 "defaults.c"
+# 3291 "defaults.c"
  { "label_mac", "" , CKN_STR_DEFAULT , CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+
+
+
+
+
+ { "captcha_enable" , "1", CKN_STR1 , CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
+
  { "jffs2_enable", "1", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "jffs2_scripts", "1", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "jffs2_format", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16907,7 +16952,7 @@ struct nvram_tuple router_state_defaults[] = {
 
  { "dms_state", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "dms_dbcwd", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3534 "defaults.c"
+# 3545 "defaults.c"
  { "apps_dev", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "apps_mounted_path", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "apps_state_action", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16954,7 +16999,7 @@ struct nvram_tuple router_state_defaults[] = {
  { "vpn_client4_errno", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "vpn_client5_state", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "vpn_client5_errno", "", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
-# 3701 "defaults.c"
+# 3712 "defaults.c"
  { "le_state", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_state_t", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "le_sbstate_t", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -16975,13 +17020,14 @@ struct nvram_tuple router_state_defaults[] = {
  { "ddns_last_wan_unit", "-1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "reboot_time", "70", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
 
+ { "app_access", "0", CKN_STR1, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { 0, 0, 0, 0, 0, 0, 0 }
 };
-# 4061 "defaults.c"
+# 4073 "defaults.c"
 struct nvram_tuple bcm4360ac_defaults[] = {
  { 0, 0, 0, 0, 0, 0, 0 }
 };
-# 4185 "defaults.c"
+# 4197 "defaults.c"
 struct nvram_tuple router_defaults_override_type1[] = {
  { "router_disable", "1", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
  { "lan_stp", "0", CKN_STR_DEFAULT, CKN_TYPE_DEFAULT, CKN_ACC_LEVEL_DEFAULT, CKN_ENC_DEFAULT, 0 },
@@ -17063,9 +17109,9 @@ static void
 fix_name(const char *name, char *fixed_name)
 {
  char *pSuffix = 
-# 4265 "defaults.c" 3 4
+# 4277 "defaults.c" 3 4
                 ((void *)0)
-# 4265 "defaults.c"
+# 4277 "defaults.c"
                     ;
 
 
@@ -17075,17 +17121,17 @@ fix_name(const char *name, char *fixed_name)
  pSuffix = strchr(name, '_');
 
  if ((strncmp(name, "wl", 2) == 0) && 
-# 4273 "defaults.c" 3 4
+# 4285 "defaults.c" 3 4
                                      ((*__ctype_b_loc ())[(int) ((
-# 4273 "defaults.c"
+# 4285 "defaults.c"
                                      name[2]
-# 4273 "defaults.c" 3 4
+# 4285 "defaults.c" 3 4
                                      ))] & (unsigned short int) _ISdigit) 
-# 4273 "defaults.c"
+# 4285 "defaults.c"
                                                       && (pSuffix != 
-# 4273 "defaults.c" 3 4
+# 4285 "defaults.c" 3 4
                                                                      ((void *)0)
-# 4273 "defaults.c"
+# 4285 "defaults.c"
                                                                          )) {
   strcpy(fixed_name, "wl");
   strcpy(&fixed_name[2], pSuffix);
@@ -17097,7 +17143,7 @@ fix_name(const char *name, char *fixed_name)
 }
 
 extern char *tcode_default_get(const char *name);
-# 4293 "defaults.c"
+# 4305 "defaults.c"
 char *
 nvram_default_get(const char *name)
 {
@@ -17123,7 +17169,7 @@ nvram_default_get(const char *name)
    return lan_ipaddr;
   }
  }
-# 4342 "defaults.c"
+# 4354 "defaults.c"
  {
   char *value = tcode_default_get(fixed_name);
   if (value) {
@@ -17134,18 +17180,18 @@ nvram_default_get(const char *name)
 
 
  if ((strncmp(name, "wl", 2) == 0) && 
-# 4351 "defaults.c" 3 4
+# 4363 "defaults.c" 3 4
                                      ((*__ctype_b_loc ())[(int) ((
-# 4351 "defaults.c"
+# 4363 "defaults.c"
                                      name[2]
-# 4351 "defaults.c" 3 4
+# 4363 "defaults.c" 3 4
                                      ))] & (unsigned short int) _ISdigit) 
-# 4351 "defaults.c"
+# 4363 "defaults.c"
                                                       && (name[3] == '_'))
  for (idx = 0; router_defaults[idx].name != 
-# 4352 "defaults.c" 3 4
+# 4364 "defaults.c" 3 4
                                            ((void *)0)
-# 4352 "defaults.c"
+# 4364 "defaults.c"
                                                ; idx++) {
   if (strcmp(router_defaults[idx].name, name) == 0) {
    return router_defaults[idx].value;
@@ -17153,9 +17199,9 @@ nvram_default_get(const char *name)
  }
 
  for (idx = 0; router_defaults[idx].name != 
-# 4358 "defaults.c" 3 4
+# 4370 "defaults.c" 3 4
                                            ((void *)0)
-# 4358 "defaults.c"
+# 4370 "defaults.c"
                                                ; idx++) {
   if (strcmp(router_defaults[idx].name, fixed_name) == 0) {
    return router_defaults[idx].value;
@@ -17163,9 +17209,9 @@ nvram_default_get(const char *name)
  }
 
  return 
-# 4364 "defaults.c" 3 4
+# 4376 "defaults.c" 3 4
        ((void *)0)
-# 4364 "defaults.c"
+# 4376 "defaults.c"
            ;
 }
 
@@ -17189,7 +17235,7 @@ nvram_validate_all(char *prefix, bool restore)
    nvram_set(tmp, v ? v : t->value);
   }
  }
-# 4402 "defaults.c"
+# 4414 "defaults.c"
 }
 
 
@@ -17205,5 +17251,5 @@ nvram_restore_var(char *prefix, char *name)
    break;
   }
  }
-# 4429 "defaults.c"
+# 4441 "defaults.c"
 }

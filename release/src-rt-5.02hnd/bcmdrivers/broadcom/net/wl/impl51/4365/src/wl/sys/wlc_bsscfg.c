@@ -2183,6 +2183,14 @@ wlc_bsscfg_free_ext(wlc_info_t *wlc, wlc_bsscfg_t *bsscfg)
 	wlc_bsscfg_bcmcscbdeinit(wlc, bsscfg);
 }
 
+#ifdef STA
+static int
+wlc_bsscfg_free_remove_asq(wlc_info_t *wlc, wlc_bsscfg_t *cfg)
+{
+	return wlc_remove_assoc_req(wlc, cfg);
+}
+#endif
+
 void
 wlc_bsscfg_free(wlc_info_t *wlc, wlc_bsscfg_t *bsscfg)
 {
@@ -2248,6 +2256,10 @@ wlc_bsscfg_free(wlc_info_t *wlc, wlc_bsscfg_t *bsscfg)
 		wlc_wlcif_free(wlc, wlc->osh, bsscfg->wlcif);
 		bsscfg->wlcif = NULL;
 	}
+
+#ifdef STA
+	wlc_bsscfg_free_remove_asq(wlc, bsscfg);
+#endif
 
 	/* free the wlc_bsscfg struct if it was an allocated one */
 	idx = bsscfg->_idx;

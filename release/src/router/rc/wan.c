@@ -1101,7 +1101,11 @@ _dprintf("start_wan_if: USB modem is scanning...\n");
 		else if(strcmp(modem_type, "wimax")){
 			char *modem_argv[] = {"/usr/sbin/modem_enable.sh", NULL};
 			int sim_state;
+#if defined(RT4GAC53U) /* workaround for re-detect the SIM card */
+			int count = 10;
 
+detect_sim:
+#endif
 			putenv(env_unit);
 			_eval(modem_argv, ">>/tmp/usb.log", 0, NULL);
 			unsetenv("unit");
@@ -1122,6 +1126,13 @@ _dprintf("start_wan_if: USB modem is scanning...\n");
 						return;
 					}
 					else if(sim_state != 1){
+#if defined(RT4GAC53U) /* workaround for re-detect the SIM card */
+						if (count-- > 0) {
+							TRACE_PT("3g end: re-detect the SIM card [%d/10]\n", count);
+							sleep(1);
+							goto detect_sim;
+						}
+#endif
 						TRACE_PT("3g end: SIM isn't ready.\n");
 						update_wan_state(prefix, WAN_STATE_STOPPED, WAN_STOPPED_REASON_NONE);
 						return;
@@ -2675,8 +2686,10 @@ wan_up(const char *pwan_ifname)
 
 #if !defined(RTCONFIG_MULTIWAN_CFG)
 	if (wan_unit != wan_primary_ifunit()
+#ifndef RT4GAC68U
 #ifdef RTCONFIG_DUALWAN
 			|| nvram_match("wans_mode", "lb")
+#endif
 #endif
 			)
 	{

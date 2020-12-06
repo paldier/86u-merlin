@@ -71,7 +71,7 @@ export PATH := $(RELEASEDIR)/tools:$(SRCBASE)/ctools:$(PATH)
 #aimesh:R(384 and 385),non-aimesh:B(382 and 384),special:X(382/384/385/386)
 export MERLINR_NAME := RTAC86U
 export MERLINR_VER_MAJOR :=R
-export MERLINR_VER_MINOR :=5.1.2
+export MERLINR_VER_MINOR :=5.1.3
 export MERLINR_VER := $(MERLINR_VER_MAJOR)$(MERLINR_VER_MINOR)
 export MERLINRVER := $(MERLINR_NAME)_$(MERLINR_VER)
 
@@ -1453,19 +1453,17 @@ define RouterOptions
 		sed -i "/RTCONFIG_PUSH_EMAIL/d" $(1); \
 		echo "RTCONFIG_PUSH_EMAIL=y" >>$(1); \
 	fi; \
-	if [ "$(AHS)" = "y" ]; then \
+	if [ "$(AHS)" = "n" ]; then \
 		sed -i "/RTCONFIG_AHS/d" $(1); \
-		echo "RTCONFIG_AHS=y" >>$(1); \
-		sed -i "/RTCONFIG_HTTPS/d" $(1); \
-		echo "RTCONFIG_HTTPS=y" >>$(1); \
+		echo "# RTCONFIG_AHS is not set" >>$(1); \
 		sed -i "/RTCONFIG_LIBASC/d" $(1); \
-		echo "RTCONFIG_LIBASC=y" >>$(1); \
+		echo "# RTCONFIG_LIBASC is not set" >>$(1); \
 	fi; \
-	if [ "$(ASD)" = "y" ]; then \
+	if [ "$(ASD)" = "n" ]; then \
 		sed -i "/RTCONFIG_ASD/d" $(1); \
-		echo "RTCONFIG_ASD=y" >>$(1); \
+		echo "# RTCONFIG_ASD is not set" >>$(1); \
 		sed -i "/RTCONFIG_LIBASC/d" $(1); \
-		echo "RTCONFIG_LIBASC=y" >>$(1); \
+		echo "# RTCONFIG_LIBASC is not set" >>$(1); \
 	fi; \
 	if [ "$(RSYSLOGD)" = "y" ]; then \
 		sed -i "/RTCONFIG_RSYSLOGD/d" $(1); \
@@ -2239,6 +2237,10 @@ define RouterOptions
 		else \
 			echo "# RTCONFIG_BW160M is not set" >>$(1); \
 		fi; \
+		if [ "$(MERLINR_VER_MAJOR)" = "X" ] && [ "$(BUILD_NAME)" = "RT-AC86U" ] ; then \
+			sed -i "/RTCONFIG_BW160M/d" $(1); \
+			echo "RTCONFIG_BW160M=y" >>$(1); \
+		fi; \
 	fi; \
 	if [ "$(DPSTA)" = "y" ]; then \
 		sed -i "/RTCONFIG_DPSTA/d" $(1); \
@@ -2308,6 +2310,10 @@ define RouterOptions
 	fi; \
 	fi; \
 	fi; \
+	fi; \
+	if [ "$(CRASHLOG)" = "y" ]; then \
+		sed -i "/RTCONFIG_BCM_HND_CRASHLOG/d" $(1); \
+		echo "RTCONFIG_BCM_HND_CRASHLOG=y" >>$(1); \
 	fi; \
 	if [ "$(TOR)" = "y" ]; then \
 		sed -i "/RTCONFIG_TOR/d" $(1); \
@@ -2863,9 +2869,9 @@ define RouterOptions
 		sed -i "/RTCONFIG_OPEN_NAT/d" $(1); \
 		echo "RTCONFIG_OPEN_NAT=y" >>$(1); \
 	fi; \
-	if [ "$(FRS_LIVE_UPDATE)" = "y" ]; then \
+	if [ "$(FRS_LIVE_UPDATE)" = "n" ]; then \
 		sed -i "/RTCONFIG_FRS_LIVE_UPDATE/d" $(1); \
-		echo "RTCONFIG_FRS_LIVE_UPDATE=y" >>$(1); \
+		echo "# RTCONFIG_FRS_LIVE_UPDATE is not set" >>$(1); \
 	fi; \
 	if [ "$(UUPLUGIN)" = "y" ]; then \
 		sed -i "/RTCONFIG_UUPLUGIN/d" $(1); \

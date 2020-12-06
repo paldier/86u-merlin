@@ -2,7 +2,7 @@
 #
 # WlGetDriverCfg.sh <WiFi interface name> <Band: 2|5> <Driver mode: nic|dhd>
 #
-# Copyright (C) 2018, Broadcom. All Rights Reserved.
+# Copyright (C) 2020, Broadcom. All Rights Reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -20,11 +20,12 @@
 #
 # <<Broadcom-WL-IPTag/Proprietary,Open:.*>>
 #
-
+IFS=
 show_help () {
-	echo "Syntax: $0 <WiFi interface name> <Band: 2|5> <Driver mode: nic|dhd>"
-	echo "Example 1: $0 wl1  2 nic"
-	echo "Example 2: $0 eth5 5 dhd"
+	echo "Syntax: $0 <WiFi interface name> <Band: 2|5> <Driver mode: auto|nic|dhd>"
+	echo "Example 1: $0 wl1  2 auto"
+	echo "Example 2: $0 eth5 2 nic"
+	echo "Example 3: $0 eth5 5 dhd"
 	#echo "Try \`$0 --help' for more information."
 	exit
 }
@@ -55,6 +56,15 @@ fi
 
 # Argument 3 is driver mode
 mode=$3
+if [ $mode = "auto" ]; then
+	fwid=$(wl -i $ifname ver | grep -c FWID)
+	if [ $fwid = "1" ]; then
+		mode="dhd"
+	else
+		mode="nic"
+	fi
+fi
+
 if [[ $mode != "nic" ]] && [[ $mode != "dhd" ]]; then
 echo "Invalid driver mode!"
 show_help
@@ -72,8 +82,14 @@ echo ""
 echo ""
 echo -n $ifname WL driver version = ; echo $(wl -i $ifname ver)
 echo -n $ifname WL revinfo = ; echo $(wl -i $ifname revinfo)
+
+# Overwrite msglevel
+WLMSGLVL=`wl -i $ifname msglevel | cut -d ' ' -f1`
+wl -i $ifname msglevel 0
 if [[ $mode == "dhd" ]]; then
   echo -n $ifname DHD version = ; echo $(dhd -i $ifname ver)
+  DHDMSGLVL=`dhd -i $ifname msglevel | cut -d ' ' -f1`
+  dhd -i $ifname msglevel 0
 fi
 
 echo ""
@@ -113,6 +129,19 @@ echo -n eap_restrict=; echo $(wl -i $ifname eap_restrict)
 echo -n event_msgs=; echo $(wl -i $ifname event_msgs)
 echo -n event_msgs_ext=; echo $(wl -i $ifname event_msgs_ext)
 echo -n fragthresh=; echo $(wl -i $ifname fragthresh)
+echo -n he=; echo $(wl -i $ifname he)
+echo -n he_cap=; echo $(wl -i $ifname he cap)
+echo -n he_enab=; echo $(wl -i $ifname he enab)
+echo -n he_features=; echo $(wl -i $ifname he features)
+echo -n he_bsscolor=; echo $(wl -i $ifname he bsscolor)
+echo -n he_partialbsscolor=; echo $(wl -i $ifname he partialbsscolor)
+echo -n he_dynfrag=; echo $(wl -i $ifname he dynfrag)
+echo -n he_htc=; echo $(wl -i $ifname he htc)
+echo -n he_muedca=; echo $(wl -i $ifname he muedca)
+echo -n he_peduration=; echo $(wl -i $ifname he peduration)
+echo -n he_ppet=; echo $(wl -i $ifname he ppet)
+echo -n he_range_ext=; echo $(wl -i $ifname he range_ext)
+echo -n he_rtsdurthresh=; echo $(wl -i $ifname he rtsdurthresh)
 echo -n hw_rxchain=; echo $(wl -i $ifname hw_rxchain)
 echo -n hw_txchain=; echo $(wl -i $ifname hw_txchain)
 echo -n interference=; echo $(wl -i $ifname interference)
@@ -129,6 +158,8 @@ echo -n msglevel=; echo $(wl -i $ifname msglevel)
 echo -n vhtmode=; echo $(wl -i $ifname vhtmode)
 echo -n vht_features=; echo $(wl -i $ifname vht_features)
 echo -n mu_features=; echo $(wl -i $ifname mu_features)
+echo -n mu_policy=; echo $(wl -i $ifname mu_policy)
+echo -n muinfo=; echo $(wl -i $ifname muinfo)
 echo -n wet_enab=; echo $(wl -i $ifname wet_enab)
 echo -n nar=; echo $(wl -i $ifname nar)
 echo -n nar_handle_ampdu=; echo $(wl -i $ifname nar_handle_ampdu)
@@ -201,8 +232,10 @@ echo -n vndr_ie=; echo $(wl -i $ifname vndr_ie)
 echo -n wdstimeout=; echo $(wl -i $ifname wdstimeout)
 echo -n wet_tunnel=; echo $(wl -i $ifname wet_tunnel)
 echo -n wme=; echo $(wl -i $ifname wme)
-echo -n wme_ac_ap=; echo $(wl -i $ifname wme_ac_ap)
+echo -n wme_ac_ap=; echo "$(wl -i $ifname wme_ac_ap)"
+echo -n wme_ac ap=; echo $(wl -i $ifname wme_ac ap)
 echo -n wme_ac_sta=; echo $(wl -i $ifname wme_ac_sta)
+echo -n wme_ac sta=; echo "$(wl -i $ifname wme_ac sta)"
 echo -n wme_apsd=; echo $(wl -i $ifname wme_apsd)
 echo -n wme_bss_disable=; echo $(wl -i $ifname wme_bss_disable)
 echo -n wme_dp=; echo $(wl -i $ifname wme_dp)
@@ -314,6 +347,19 @@ echo -n mrate=; echo $(wl -i $ifname mrate)
 echo -n curppr=; echo $(wl -i $ifname curppr)
 echo -n suprates=; echo $(wl -i $ifname suprates)
 echo -n rrm=; echo $(wl -i $ifname rrm)
+echo -n msched=; echo $(wl -i $ifname msched)
+echo -n msched rucfg=; echo $(wl -i $ifname msched rucfg)
+echo -n msched maxn=; echo $(wl -i $ifname msched maxn)
+echo -n umsched=; echo $(wl -i $ifname umsched)
+echo -n dfs_postism=; echo $(wl -i $ifname dfs_postism)
+echo -n dfs_pretism=; echo $(wl -i $ifname dfs_preism)
+echo -n ldpc_cap=; echo $(wl -i $ifname ldpc_cap)
+echo -n ldpc_tx=; echo $(wl -i $ifname ldpc_tx)
+echo -n mfp=; echo $(wl -i $ifname mfp)
+echo -n pkteng_cmd=; echo $(wl -i $ifname pkteng_cmd)
+echo -n twt_prestop=; echo $(wl -i $ifname twt_prestop)
+echo -n twt_prestrt=; echo $(wl -i $ifname twt_prestrt)
+echo -n txbf_mutimer=; echo $(wl -i $ifname txbf_mutimer)
 
 echo ""
 echo ""
@@ -413,6 +459,7 @@ echo -n wmf_ucast_igmp=; echo $(dhd -i $ifname wmf_ucast_igmp)
 echo -n wmf_ucast_upnp=; echo $(dhd -i $ifname wmf_ucast_upnp)
 echo -n wowl_wakeind=; echo $(dhd -i $ifname wowl_wakeind)
 echo -n op_mode=; echo $(dhd -i $ifname op_mode)
+echo -n pciecfgreg offset 0xb4=; echo $(dhd -i $ifname pciecfgreg 0xb4)
 fi
 
 echo ""
@@ -421,5 +468,10 @@ echo "-----------------------"
 echo "NVRAM config parameters"
 echo "-----------------------"
 nvram show
+# restore msglevel
+wl -i $ifname msglevel $WLMSGLVL
+if [[ $mode == "dhd" ]]; then
+  dhd -i $ifname msglevel $DHDMSGLVL
+fi
 
 # Done
